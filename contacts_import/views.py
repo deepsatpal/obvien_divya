@@ -1,7 +1,8 @@
 import codecs
+from http.client import HTTPResponse
 import json
 from smtplib import OLDSTYLE_AUTH
-from tkinter import EXCEPTION
+#from tkinter import EXCEPTION
 from django.urls import reverse
 
 from pprint import pprint
@@ -26,27 +27,48 @@ from .csv import *
 from querystring_parser import parser
 from scrape_web.views import scrape_csv_contacts
 import threading
-
+from django.core.mail import send_mail
 from django.conf import settings
 
+# def beta_login(request):
+#     try:
+#         context = {}
+#         if request.session.get('csv_stats', None):
+#                 context['csv_stats'] = request.session['csv_stats']
+#                 del request.session['csv_stats']
+
+#         if request.session.get('first_time_login', None) and request.session['first_time_login'] == True:
+#                 context['first_time_login'] = True 
+#                 request.session['first_time_login'] = False
+#                 messages.success(request , "Welcome to Obvien! Let’s get you started shows walk-through <a href='#'>Ok</a>")
+#         print(request.session.get)
+#         return render(request, 'csv/csv_form.html')
+#     except Exception as e:
+#         print(request.session.get)
 
 def index(request):
-    context = {}
+    try:
+    # return HttpResponse("here",request)
+        context = {}
 
-    context['csv_headers'] = get_csv_headers()
-    context['csv_initial_headers'] = context['csv_headers'][:7]
-    context['csv_additional_headers'] = context['csv_headers'][7:]
-    context['csv_headers_description'] = get_csv_headers_description()
+        context['csv_headers'] = get_csv_headers()
+        context['csv_initial_headers'] = context['csv_headers'][:7]
+        context['csv_additional_headers'] = context['csv_headers'][7:]
+        context['csv_headers_description'] = get_csv_headers_description()
 
-    if request.session.get('csv_stats', None):
-        context['csv_stats'] = request.session['csv_stats']
-        del request.session['csv_stats']
+        if request.session.get('csv_stats', None):
+            context['csv_stats'] = request.session['csv_stats']
+            del request.session['csv_stats']
 
-    if request.session.get('first_time_login', None) and request.session['first_time_login'] == True:
-        context['first_time_login'] = True 
-        request.session['first_time_login'] = False
-        
-    return render(request, "csv/csv_form.html", context)
+        if request.session.get('first_time_login', None) and request.session['first_time_login'] == True:
+            context['first_time_login'] = True 
+            # messages.info(request , "Welcome to Obvien! Let’s get you started shows walk-through <a href='#'>Ok</a>")
+            request.session['first_time_login'] = False
+        print(request.session.get)
+        # return HttpResponse(request , '<h1>Hello</h1>')
+        return render(request, "csv/csv_form.html", context)
+    except Exception as e:
+        print('error: %s' % e)
 
 
 def import_csv(request):
@@ -64,13 +86,12 @@ def import_csv(request):
         else:
             errors = csv_form.errors.as_json()
             errors = json.loads(errors)
-            
-            if 'csv' in errors:
-            
-                messages.add_message(request, messages.ERROR, errors['csv'][0]['message'])
-            
-            return redirect('index')
-
+            try:
+                if 'csv' in errors:
+                    messages.add_message(request, messages.ERROR, errors['csv'][0]['message'])
+                return redirect('indexeE')
+            except Exception as e:
+                return HttpResponse("Here" , e)
         data_set = csv_file.read().decode('ISO-8859-1')
 
         # setup a stream which is when we loop through each line we are able to handle a data in a stream
@@ -78,46 +99,51 @@ def import_csv(request):
         if csv_type == "custom_csv":
             header_uplod_csv = io_string.readlines()[0]
             header_uplods_csv = header_uplod_csv.split(",")
-            header = [x.replace('\r\n', '') for x in header_uplods_csv]
+            header = [x.replace('\n', '') for x in header_uplods_csv]
+            print("HEADER: %s" % header)
             headers = [i for i in header if i]
             io_string = io.StringIO(data_set)
             if not validate_csv_headers(headers):
                 messages.add_message(request, messages.ERROR, 'Headers in CSV are not Identical!')
-                return redirect('index')
-        elif csv_type == "social_csv":
+                return redirect('indexeE')
+                # Social_CSV 
+        elif csv_type == "social_csv":     
             header_uplod_csv = io_string.readline().strip()
-            
-            while header_uplod_csv and ('first name,' not in header_uplod_csv.lower() and 'last name,' not in header_uplod_csv.lower()):
-                header_index += 1
-                #print("Updating header index to ")
-                print(header_index)
-                header_uplod_csv = io_string.readline().strip()  
-                #print(header_uplod_csv)
+            print('header_uplod_csv: %s' % header_uplod_csv)
 
-            header_uplod_csv = io_string.readline().strip()  
-            #print(header_uplod_csv)
-            #messages.add_message(request, messages.ERROR, 'Work in progress!')
-            #return redirect('index')
-            #header_uplod_csv = io_string.readlines()[0].strip()            
+            
+            # while header_uplod_csv and ('first_name,' not in header_uplod_csv.lower() and 'last_name,' not in header_uplod_csv.lower()):
+            #     header_index += 1
+            #     #print("Updating header index to ")
+            #     header_uplod_csv = io_string.readline().strip()  
+            #     # print("header_uplod_csv:" , header_uplod_csv)
+
+            # header_uplod_csv = io_string.readline().strip()  
+            # print('jfkm',header_uplod_csv)
+            # # messages.add_message(request, messages.ERROR, 'Work in progress!')
+            # #return redirect('index')
+
+            # # header_uplod_csv = io_string.readlines()[0]           
             header_uplods_csv = header_uplod_csv.split(",")            
             header = [x.replace('\r\n', '') for x in header_uplods_csv]
+            print("headerrs:::-->" , header)
             headers = [i for i in header if i]
-            print("Printing CSV headers ")
-            print(headers)
+            print("Printing CSV headers :", headers)
             
             io_string = io.StringIO(data_set)
             if not validate_social_csv_header(headers):
                 messages.add_message(request, messages.ERROR, 'Headers in CSV are not Identical!')
-                return redirect('index')
+                return redirect('indexeE')
         else:
             header_uplod_csv = io_string.readlines()[0]
             header_uplods_csv = header_uplod_csv.split(",")
             header = [x.replace('\r\n', '') for x in header_uplods_csv]
-            headers = [i for i in header if i]
+            headers = [i for i in header if i]  
             io_string = io.StringIO(data_set)
             if not validate_csv_headers(headers):
                 messages.add_message(request, messages.ERROR, 'Headers in CSV are not Identical!')
-                return redirect('index')
+                return redirect('indexeE')
+                # return HttpResponse("here")
 
         # start: validation insert
         
@@ -152,6 +178,8 @@ def import_csv(request):
                 # print("CSV Row ", csv_row)
                 
             if csv_type == "custom_csv":
+                print('===============DONE++++++++++++++++++1')
+                
 
                 if 'first_name' not in csv_row:
 
@@ -219,6 +247,7 @@ def import_csv(request):
                     contact_first_name = (''.join(e for e in csv_row['first_name'] if e.isalnum() or e == ' '))
                     contact_last_name = (''.join(e for e in csv_row['last_name'] if e.isalnum() or e == ' '))
                     contact_middle_name = (''.join(e for e in csv_row['middle_name'] if e.isalnum() or e == ' '))
+                    print('===============DONE++++++++++++++++++3')
                     
                     if Contact.objects.filter(first_name__iexact=contact_first_name,
                                               middle_name__iexact=contact_middle_name,
@@ -236,8 +265,10 @@ def import_csv(request):
 
                         if csv_tags:
                             csv_tag_method(csv_tags, request.user.id, contact.id)
+                            
                         #csv_tag_method(request.FILES['csv'].name, request.user.id, contact.id)
                         continue
+
                     else:
                         contact, created = Contact.objects.update_or_create(
                             defaults={'user_id': request.user.id, 'first_name': contact_first_name,
@@ -355,7 +386,7 @@ def import_csv(request):
 
                         if csv_tags:
                             csv_tag_method(csv_tags, request.user.id, contact.id)
-                            
+                           
                         #csv_tag_method(request.FILES['csv'].name, request.user.id, contact.id)
 
                         if contact_type == "1st_degrees":
@@ -537,7 +568,9 @@ def import_csv(request):
         # Start Scrape contacts from social and web plateforms
         # download_thread = threading.Thread(target=scrape_csv_contacts, name="scrape_csv_contacts", args=(request.user.id,))
         # download_thread.start()
-        return redirect('index')
+        print('===============DONE++++++++++++++++++3')
+
+        return redirect('indexeE')
         # messages.add_message(request, messages.INFO, rejected_rows)
 
         #
@@ -859,59 +892,57 @@ def twitter_login(request):
 
 
 def twitter_test_auth(request):
-    import tweepy
-    #auth = tweepy.OAuth1UserHandler('lND3s1fMigwVipwKKHX1fzEgP', 'YZDrmRLJ14jqN82top6vnSl034PGF5JfwTeNgnjs3TPuOAOyah')
-    auth = tweepy.OAuth1UserHandler('i5vjFiOTq0gNkUA3peRtFNnOb', 'mLrS10j3PxLgcYKVqm3HhVpfQWbpxgPJircimh8adCsNqHEUxR')
-
-    url = auth.get_authorization_url(signin_with_twitter=True)
-
-    print("URL ", url)
-    print("request oauth_token ", request.GET.get('oauth_token'))
-    print("request oauth_token_secret ", request.GET.get('oauth_verifier'))    
-    
-    auth.request_token = {
-        'oauth_token': request.GET.get('oauth_token'), 
-        'oauth_token_secret':  request.GET.get('oauth_verifier')
-    }  
-
-    print("auth ", auth)
-    
-    auth = tweepy.OAuth1UserHandler(
-       'lND3s1fMigwVipwKKHX1fzEgP', 'YZDrmRLJ14jqN82top6vnSl034PGF5JfwTeNgnjs3TPuOAOyah',
-       request.GET.get('oauth_token'), request.GET.get('oauth_verifier')
-    )
-    api = tweepy.API(auth)    
-    
-    
-    # print("Printing request.GET ")
-    # for key, value in request.GET:
-        # print("key ", key, " value ", value)
-      
-    # print("Printing request.session ")      
-    # for key, value in request.session:
-        # print("key ", key, " value ", value)
-    
-    
- 
-
-    access_token, access_token_secret = (
-        auth.get_access_token(
-            request.GET.get('oauth_verifier')
+        import tweepy
+        # auth = tweepy.OAuth1UserHandler('lND3s1fMigwVipwKKHX1fzEgP', 'YZDrmRLJ14jqN82top6vnSl034PGF5JfwTeNgnjs3TPuOAOyah')
+        auth = tweepy.OAuth1UserHandler('i5vjFiOTq0gNkUA3peRtFNnOb', 'mLrS10j3PxLgcYKVqm3HhVpfQWbpxgPJircimh8adCsNqHEUxR')
+        print('auth' ,auth)
+        url = auth.get_authorization_url(signin_with_twitter=True)
+        print("URL ", url)
+        print("request oauth_token ", request.GET.get('oauth_token'))
+        print("request oauth_token_secret ", request.GET.get('oauth_verifier'))    
+        
+        auth.request_token = {
+            'oauth_token': request.GET.get('oauth_token'), 
+            'oauth_token_secret':  request.GET.get('oauth_verifier')
+        }  
+        # print('a' , auth.request_token ,'b', request.GET.get('oauth_token' ),'c' , request.GET.get('oauth_verifier'))
+        print("auth ", auth)
+        
+        auth = tweepy.OAuth1UserHandler(
+        'lND3s1fMigwVipwKKHX1fzEgP', 'YZDrmRLJ14jqN82top6vnSl034PGF5JfwTeNgnjs3TPuOAOyah',
+        request.GET.get('oauth_token'), request.GET.get('oauth_verifier')
         )
-    )
+        api = tweepy.API(auth)    
 
-    #access_token, access_token_secret = auth.get_access_token(request.GET.get('oauth_verifier'))
-
-    return JsonResponse({});
-
+        
+        # print("Printing request.GET ")
+        # for key, value in request.GET:
+        #     print("key ", key, " value ", value)
+        
+        # print("Printing request.session ")      
+        # for key, value in request.session:
+        #     print("key ", key, " value ", value)
+        
+        
     
+        try:
+            access_token, access_token_secret = (
+                auth.get_access_token(
+                    request.GET.get('oauth_verifier')
+                )
+            )
+            print('xnnfdnefdaml',access_token, access_token_secret)
+            # access_token, access_token_secret = auth.get_access_token(request.GET.get('oauth_verifier'))
+        except Exception as e:
+            print('error : %s' , e)
+        return JsonResponse({});
+
 def twitter_token(request):
     import tweepy
 
     if 'request_token' in request.session and 'url' in request.session:
 
         return JsonResponse({'oauth_token': request.session['oauth_token'], 'url': request.session['redirect_url']})
-
     else:
 
         auth = tweepy.OAuth1UserHandler('2bqgyafUPQSSRDB9IFLN1I7Ah', 'Ucq599xJI8sdgBEM6atoHR21m9xla4ibtSn5Pj14BUpVFjYK24')
@@ -933,9 +964,10 @@ def twitter_token(request):
             print('Error! Failed to get request token.') 
 
     return JsonResponse({'oauth_token': '', 'url': ''})
-
+print("DONE")
 
 def twitter_callback(request):
+    print("------------------------------Here starting----------------------------------")
     import tweepy
     from contextlib import redirect_stdout
 
@@ -1400,25 +1432,29 @@ def facebook_contacts_import (request):
     
 def linkedin_contacts_import (request):
 
-    context = {}
+        context = {}
+        #return HttpResponse("ghj")
+        if 'linkedin_access_token' in request.session and request.session['linkedin_access_token'] is not None:
+            
+            import requests
     
-    if 'linkedin_access_token' in request.session and request.session['linkedin_access_token'] is not None:
+            lite_profile = requests.get('https://api.linkedin.com/v2/me', headers = {
+                'Authorization': 'Bearer ' + request.session['linkedin_access_token'],
+            })  
+            
+            context['linkedin_lite_profile'] = (lite_profile.text)
+            #return HttpResponse(context['linkedin_lite_profile'])
+            #print(context['linkedin_lite_profile'])
 
-        import requests
-  
-        lite_profile = requests.get('https://api.linkedin.com/v2/me', headers = {
-            'Authorization': 'Bearer ' + request.session['linkedin_access_token'],
-        })  
         
-        context['linkedin_lite_profile'] = (lite_profile.text)
-        
-        # context['linkedin_lite_profile'] = json.loads(lite_profile.text) 
+            
+            # context['linkedin_lite_profile'] = json.loads(lite_profile.text) 
 
-        # print('access_token_request ', access_token_request.text)
+            # print('access_token_request ', access_token_request.text)
+            
+            # print('LinkedIn Access Token ', request.session['linkedin_access_token'])
         
-        # print('LinkedIn Access Token ', request.session['linkedin_access_token'])
-       
-    return render(request, "linkedin/index.html", context)
+        return render(request, "linkedin/index.html", context)
         
 def linkedin_login (request):
 
@@ -1427,11 +1463,11 @@ def linkedin_login (request):
     return HttpResponse("Linkedin login")
     
 def linkedin_callback (request):
-
+    
     context = {}
     
     auth_code = request.GET.get('code', None)
-      
+    #return HttpResponse("auth code 123" + auth_code)
     if auth_code:
 
         import requests
@@ -1441,9 +1477,9 @@ def linkedin_callback (request):
             'code': auth_code,
             #'client_id': '77awx9dduw0nez',
             #'client_secret': 'V0jax7jybmW1K9ni',
-            'client_id': '77wauyj5fghjfr',
-            'client_secret': 't0hHlnSrM6edWTeW',            
-            'redirect_uri': 'https://altworkz.com/contacts/linkedin-callback',
+            'client_id': '774mkvff40jh88',
+            'client_secret': 'nktafZ4ILChLqcYA',            
+            'redirect_uri': 'http://127.0.0.1:8002/contacts/linkedin-callback',
         })
         
         response = access_token_request.text
@@ -1462,7 +1498,8 @@ def linkedin_callback (request):
 
         return HttpResponse("auth code " + auth_code)
         
-    
+    # return HttpResponse("auth code " + auth_code)
+    # return render(request , "linkedin/index.html")
     return HttpResponse("Linkedin callback")
     
 def update_graph (request):
@@ -1530,3 +1567,4 @@ def update_graph (request):
             print("Exception write ", e)
     
     return HttpResponse("Graph Update Operation")
+

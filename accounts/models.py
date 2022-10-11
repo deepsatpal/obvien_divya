@@ -8,8 +8,16 @@ from django.conf import settings
 # Create your models here.
 
 
+class AccountActivation(models.Model):
+      activation_string = models.CharField(max_length=50,default='')
+      user_id = models.IntegerField()
+      useremail = models.EmailField(max_length=30 , unique=True)
+
+
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE,primary_key = True)
+    
     first_name = models.CharField(max_length=30, blank=False )
     last_name = models.CharField(max_length=30, blank=False )
     job_title = models.CharField(max_length=30, blank=False )
@@ -17,12 +25,13 @@ class Profile(models.Model):
     #contact = models.OneToOneField(Contact, on_delete=models.CASCADE, default=0)
 
     contact_id = models.IntegerField(blank=True, default=0)
-    is_first_login = models.IntegerField(max_length=1, default=1)
+    is_first_login = models.IntegerField(default=1)
 
-class AccountActivation(models.Model):
+    
+  
 
-    activation_string = models.CharField(max_length=50, blank=False)
-    user_id = models.IntegerField(max_length=11)
+    activation_string = models.CharField(max_length=50, default='' ,blank=False)
+    
     
     class Meta:
         db_table = "unactivated_account_codes"

@@ -132,7 +132,7 @@ def do_db_search(request, query):
     db_results = search_.query(query)
     return db_results
 
-
+ 
 def do_db_save(data):
 
     name = data['name'].split(' ')
@@ -174,10 +174,11 @@ def is_url_scrapped(url, platform):
 
 def searchold(request):
     from search.search import ElasticSearch
+    
     context = {}
 
     search_type = 'elastic'
-    #search_type = 'web'
+    search_type = 'web'
 
     search_ = {}
 
@@ -233,7 +234,7 @@ def Gsearch(request):
         #     worker_queue.put(worker_id)
 
 
-        # print ('gsearch')
+        print ('gsearch')
         API_KEY = "AIzaSyB3dtqBhzm2BoMwsw9RMKImPOIHIEmZrO4"
         #SEARCH_ENGINE_ID = "008566010345248266130:gdf1s3zhbru"#linkedin
         SEARCH_ENGINE_ID = "008566010345248266130:3gvgp8unwjm"  # yahoo finance
@@ -967,7 +968,7 @@ def scrape_urls(cse, page):
     website_to_scrape = search_engine[cse]
     # if(website_to_scrape is "yahoo"):
     #     data = scrape_yahoo(page)
-    if (website_to_scrape is "bloomberg"):
+    if (website_to_scrape == "bloomberg"):
         data = scrape_bloomberg(page)
 
 

@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from spellchecker import SpellChecker
 from nltk import word_tokenize
-from altworkz.settings import ES_INDEX_URL, ES_SEARCH_URL
+from altworkz.settings import  ES_SEARCH_URL
 
 from contacts_import.models import UserFeedback, ContactDegree
 from spellchecker import SpellChecker
@@ -42,6 +42,7 @@ class ElasticSearch(Search):
             self.contact_id = user_profile[0].contact_id
 
         self.request_url = ES_SEARCH_URL
+        
         self.elastic_query = ''
         
         self.applied_elastic_filters = {
@@ -265,12 +266,12 @@ class ElasticSearch(Search):
         return django_http_resp
 
     def get_elastic_results(self):
-
+        
         #print("Build elastic query ", self.build_elastic_query_data())
         es_response = requests.get(self.request_url,
                                    headers={'Content-Type': 'application/json'},
                                    data=self.build_elastic_query_data())
-
+        print('es_response.text')
         return json.loads(es_response.text)
 
     # takes
@@ -1109,4 +1110,6 @@ class ElasticSearch(Search):
         # print(result_item)
 
         # print("------------------------------------------------------ Result Item ------------------------------------------------------")
+
+
 

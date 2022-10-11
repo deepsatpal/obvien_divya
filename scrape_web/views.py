@@ -123,7 +123,7 @@ def scrape_bloomberg_person (request):
 
 def scrape_bloomberg_company (request):
     json_data = {}
-    profile_data = False
+    profile_data= False
     try:
         get_latest_scrape = BloomCompanyScrape.objects.latest('to_scrape')
         latest_doc_scrape = get_latest_scrape.to_scrape
@@ -142,26 +142,29 @@ def scrape_bloomberg_company (request):
     organization_symbol = Organization.objects.exclude(organization_symbol__isnull=True).exclude(is_bloomberg_scraped=1).order_by('id')[start_index:end_index]
     proxies = get_proxies()
     proxy = random.choice(proxies)
-
+    print("organization_symbol",organization_symbol)
     for symbol in organization_symbol:
         if symbol.organization_symbol == '':
             continue
+    
         else:
             organization_symbol = symbol.organization_symbol
             print(organization_symbol)
             print('---------------------------Company Link----------------------------')
             print('https://www.bloomberg.com/profile/company/' + symbol.organization_symbol.strip() + ':US')
-            url = 'https://www.bloomberg.com/profile/company/' + symbol.organization_symbol.strip() + ':US'
-            # url = 'https://www.bloomberg.com/profile/company/BRMT:US'
-            # organization_symbol = 'BRMT'
+            url = ('https://www.bloomberg.com/profile/company/' + symbol.organization_symbol.strip() + ':US')
+            #url = 'https://www.bloomberg.com/profile/company/BRMT:US'
+            #organization_symbol = 'BRMT'
             print('Koi nahi chal riya')
+            print(url)
+            
             profile_data = scrape_bloomberg_company_data_page(url, proxy, organization_symbol)
             # print('*****************Profile Data***********************')
-            # print(profile_data)
+            print(profile_data)
             if profile_data is not False:
                 json_data = json.dumps(profile_data)
                 save_bloomberg_company_details(profile_data)
-
+                return HttpResponse('hello')
 def get_sec_links(start_date, end_date):
     page = 1
     from selenium.webdriver.support.ui import WebDriverWait
@@ -1923,19 +1926,24 @@ def get_proxies():
     proxies_req = urllib2.Request('https://free-proxy-list.net/')
     proxies_req.add_header('User-Agent', ua.random)
     proxies_doc = urllib2.urlopen(proxies_req).read().decode('utf8')
+   
 
     soup = BeautifulSoup(proxies_doc, 'html.parser')
-    proxies_table = soup.find(id='proxylisttable')
+    pro = soup.find_all("td")
+    #print("show",pro[0]).string
+    proxies_table = soup.find("table", {"class": "table table-striped table-bordered"})
+    #proxies_table = soup.find_all("table",_class='table table-striped table-bordered')
+   
 
-    sel = soup.find('option', attrs={'name': 'proxylisttable_length'})
+    #sel = soup.find('option', attrs={'name': 'proxylisttable_length'})
     # sel['selected'] = '80'
 
-
+    
     # Save proxies in the array
     for row in proxies_table.tbody.find_all('tr'):
         proxies.append({
             'ip': row.find_all('td')[0].string,
             'port': row.find_all('td')[1].string
         })
-
+    
     return proxies

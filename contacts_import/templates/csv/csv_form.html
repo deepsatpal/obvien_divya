@@ -5,6 +5,13 @@
 <!-- ======= csv Section ======= -->
 {% block 'mainblock' %}
 
+		{% if messages %}
+		<div class="alert alert-success" role="" >
+			{% for message in messages %}
+					{{ message }}
+			{% endfor %}
+		</div>
+	{% endif %}
 	<section class="aw_section aw_section_csv">
 
 		<div class="aw_section_header">

@@ -109,7 +109,7 @@ def index(request):
         results['search_results'] = search_results
         results['web_results'] = web_results   
         '''
-
+        print('working')
         # results = json.loads(
         #     open(os.path.join(BASE_DIR, 'search/static/search/json/data.json'), "r").read())
         # context['results'] = results
@@ -124,11 +124,11 @@ def index(request):
 
 def es_search(request):
 
-    # os.system('cls')  # clear screen to refresh console messages
+    os.system('cls')  # clear screen to refresh console messages
 
     context = {}
 
-    # search_type = 'web'
+    search_type = 'web'
     search_type = 'elastic'
 
     search = {}
@@ -136,9 +136,11 @@ def es_search(request):
 
     print("------- PARAMS -------")
     print(params_dict)
-
-    filters = params_dict.get('filters', None)
-    filter_weights = params_dict.get('filter_weights', None)
+    try:
+        filters = params_dict.get('filters', None)
+        filter_weights = params_dict.get('filter_weights', None)
+    except Exception as e:
+        print('error : %s' % e)
 
     if filter_weights:
         context['filter_weights'] = filter_weights
@@ -158,6 +160,7 @@ def es_search(request):
     # filter_weights = {}
     if filter_weights:
         function_type = 'user_defined'
+        print('----------Here---------')
 
     if request.method == "GET" and request.GET.get('search_str', False):
 
@@ -168,12 +171,12 @@ def es_search(request):
         if search_type == 'elastic':
 
             search = ElasticSearch(request.user.id)
-
             save_search = SearchHistory()
             save_search.search_term = request.GET.get('search_str', False).strip()
             save_search.filters = json.dumps(filters) if filters else None
             save_search.filter_weights = json.dumps(context['filter_weights']) if 'filter_weights' in context else None
             save_search.user_id = request.user.id
+            print('-----Here------' ,save_search.user_id)
 
             if request.GET.get('first_search_after_pageload') == 'true':
 
@@ -201,22 +204,23 @@ def es_search(request):
                         save_search.save()
                         request.session['search_history_id'] = save_search.id
 
-            # print('first_search_after_page_load')
-            # print(request.GET.get('first_search_after_pageload'))
-            # print("------------------------- SEARCH HISTORY ID -------------------------\n " + str(save_search.id))
-            # print(request.GET.get(''))
-        # ws = WebSearch()
+            print('first_search_after_page_load')
+            print(request.GET.get('first_search_after_pageload'))
+            print("------------------------- SEARCH HISTORY ID -------------------------\n " + str(save_search.id))
+            print(request.GET.get(''))
+        ws = WebSearch()
         page_num = request.GET.get('page_num', 1)
-        #print("page num in view ", page_num)
+        print("page num in view ", page_num)
         additional_values_to_be_forwarded = {}
+        print('here the values to be forwarded' ,additional_values_to_be_forwarded)
         context['results'] = search.query(request.GET.get('search_str', False), function_type, filters, filter_weights, page_num, additional_values_to_be_forwarded) # {'location': 'Manchester', 'industry': 'Engineering'} with filters
         context['total_results'] = additional_values_to_be_forwarded['total_results']
-        
+        print('yes:' , context['total_results'])
         if request.GET.get('view_saved_search', False):
             context['view_saved_search'] = True
             
 
-    # if filters := params_dict.get('filters', None):
+    if filters := params_dict.get('filters', None):
         first_degree = []
         second_degree = []
         third_degree = []
@@ -481,7 +485,7 @@ def F10K(request):
         }
     }
 
-    company_sec = sec_companies[request.GET["company"]]
+    company_sec = sec_companies[request.GET[company]]
 
     company = Company(company_sec.get('name'), company_sec.get('cik'))
 
@@ -540,7 +544,7 @@ def F10K(request):
     context = {
         'person_list': person_list,
         'Company': company_sec
-    }
+    } 
 
     return render(request, 'search/scrape_results.html', context)
 
@@ -670,19 +674,21 @@ def get_filters_suggestions (request):
     search_type = 'elastic'
     search = {}
     params_dict = parser.parse(request.GET.urlencode())
-
+    print(params_dict)
     print("------- PARAMS -------")
     print(params_dict)
 
     filters = params_dict.get('filters', None)
+    try:
+        if request.method == "GET" and request.GET.get('search_str', False):
 
-    if request.method == "GET" and request.GET.get('search_str', False):
-
-        if search_type == 'elastic':
-            function_type = 'user_defined'
-            search = ElasticSearch(request.user.id)    
-            context['filter_suggestions'] = search.fetch_filter_suggestions(request.GET.get('search_str', False), filters)['hits']['hits'] # {'location': 'Manchester', 'industry': 'Engineering'} with filters
+            if search_type == 'elastic':
+                function_type = 'user_defined'
+                search = ElasticSearch(request.user.id)    
+                context['filter_suggestions'] = search.fetch_filter_suggestions(request.GET.get('search_str', False), filters)['hits']['hits'] # {'location': 'Manchester', 'industry': 'Engineering'} with filters
+                    
+                context['filter_suggestions'] = map(lambda es_result : es_result['_source'], context['filter_suggestions'])
                 
-            context['filter_suggestions'] = map(lambda es_result : es_result['_source'], context['filter_suggestions'])
-                
-    return HttpResponse(json.dumps(list(context['filter_suggestions']), sort_keys=False, indent=4))
+        return HttpResponse(json.dumps(list(context['filter_suggestions']), sort_keys=False, indent=4))
+    except Exception as e:
+        return HttpResponse(json.dumps(list(context[e]), sort_keys=False, indent=4)) 

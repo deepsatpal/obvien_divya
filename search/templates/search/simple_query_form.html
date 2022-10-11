@@ -48,6 +48,7 @@
                         url: 'http://localhost:8000/search/elastic-search-compare',
                         method: 'POST',
                         data: {query: search_text},
+                        console.log('data' ,data)
                         success: function (response) {
                             // $('#response').html(response);
                             var search_results = JSON.parse(response);

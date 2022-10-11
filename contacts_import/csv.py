@@ -284,13 +284,15 @@ def add_csv_row (csv_row, contact_type, tags, request, index):
 
 def validate_csv_headers(headers):
     impo_csv_herders = set(import_csv_headers())
-    print(headers)
+    print('impo_csv_herders',impo_csv_herders)
     upload_csv_headers = set(headers)
+    print('upload_csv_headers:' ,upload_csv_headers)
 
     if impo_csv_herders.issubset(upload_csv_headers):
         CSV_HEADERS_CONSTANTS = get_csv_headers()
         csv_headers_cons = set(CSV_HEADERS_CONSTANTS)
         csv_headers = set(headers)
+        print('CSV headers:', csv_headers)   
         if len(csv_headers) > 0:
             if not csv_headers.issubset(csv_headers_cons):
                 return False
@@ -300,9 +302,13 @@ def validate_csv_headers(headers):
 
 def validate_social_csv_header(headers):
     impo_social_csv_herders = set(import_social_csv_headers())
+    print('impo_social_csv_herders:' , impo_social_csv_herders)
     upload_social_csv_headers = set(headers)
+    print('upload_social_csv_headers:' , upload_social_csv_headers)
+    print("Check:" ,impo_social_csv_herders.issubset(upload_social_csv_headers))
 
     if impo_social_csv_herders.issubset(upload_social_csv_headers):
+        print('----------herejjjjjjj-----------')
         CSV_HEADERS_CONSTANTS = get_social_csv_headers()
         csv_headers_cons = set(CSV_HEADERS_CONSTANTS)
         csv_headers = set(headers)
@@ -312,7 +318,7 @@ def validate_social_csv_header(headers):
         return True
     else:
         return False
-        
+
 def get_csv_headers ():
 
     return [
@@ -323,7 +329,7 @@ def get_csv_headers ():
 def get_social_csv_headers ():
 
     return [
-        "First Name","Last Name","Email Address","phone","Company", "Position", "Connected On"
+        "first_name","middle_name","Email Address","phone","organization_name", "organization_job_title", "Connected On"
     ]
 
 def get_csv_table_headings ():
@@ -335,7 +341,7 @@ def get_csv_table_headings ():
         "email" : "Email",
         "phone" : "Phone No.",
         "organization_name" : "Organization / Company",
-        "organization_job_title" : "Job Title",
+        "organization_job_title" : "Job Title / Position",
         "photo" : "Photo URL",
         "mobile" : "Mobile No.",
         "city" : "City",
@@ -354,7 +360,8 @@ def import_csv_headers ():
     return ['first_name', 'last_name', 'organization_name', 'organization_job_title']
     
 def import_social_csv_headers ():
-    return ['First Name', 'Last Name', 'Company', 'Position']
+
+    return ['first_name' , 'middle_name' , 'organization_name' , 'organization_job_title']
 
 def get_csv_headers_description ():
 

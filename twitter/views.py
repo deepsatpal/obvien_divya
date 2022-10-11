@@ -26,13 +26,14 @@ from django.http import HttpResponseRedirect
 from contextlib import redirect_stdout
 from pprint import pprint
 
-oauth_token = '2bqgyafUPQSSRDB9IFLN1I7Ah'
-oauth_token_secret ='Ucq599xJI8sdgBEM6atoHR21m9xla4ibtSn5Pj14BUpVFjYK24'
-auth = tweepy.OAuth1UserHandler(oauth_token,oauth_token_secret )
+# oauth_token = '2bqgyafUPQSSRDB9IFLN1I7Ah'
+# oauth_token_secret ='Ucq599xJI8sdgBEM6atoHR21m9xla4ibtSn5Pj14BUpVFjYK24'
+auth = tweepy.OAuth1UserHandler('2bqgyafUPQSSRDB9IFLN1I7Ah','Ucq599xJI8sdgBEM6atoHR21m9xla4ibtSn5Pj14BUpVFjYK24' )
 oauth_callback_confirmed=True
 def index(request):
+    # return HttpResponse("sdfsd",request)
     
-    return HttpResponseRedirect(request,auth.get_authorization_url(signin_with_twitter=True))
+    redirect(request,auth.get_authorization_url(signin_with_twitter=True))
 
   
     print("auth ", auth)
@@ -71,16 +72,18 @@ def twitter_callback__(request):
     return HttpResponse("Look into console<br>")
     
 def twitter_callback(request):
-    
+
     from contextlib import redirect_stdout
-    
+    print("TRYING here")
+    print("TOKEN", request.GET.get('oauth_verifier'))
+
     context = {}
     
     friends_cursor = -1 if request.GET.get('cursor', None) is None else request.GET.get('cursor')
 
-    oauth_token, oauth_token_secret = auth.get_access_token(request.GET.get('oauth_verifier'))
-    
-    #if 'request_token' in request.session:
+    oauth_token = request.GET.get('oauth_verifier')
+    oauth_token_secret = request.GET.get('oauth_verifier')
+        # if 'request_token' in request.session:
 
     prev_oauth_verifier = ''
     prev_oauth_token = ''
@@ -90,7 +93,7 @@ def twitter_callback(request):
     
     if request.GET.get('oauth_verifier'):
         prev_oauth_verifier = request.GET.get('oauth_verifier')
-       
+    
     for key, value in request.session.items():
         print('{} => {}'.format(key, value))    
     print("Request Session ", (request.session))
@@ -101,33 +104,34 @@ def twitter_callback(request):
 
     api = tweepy.API(auth)
     
-
-    for friend in api.get_friends():
-        print("friend ", friend._json['name'])  
-        
-    twitter_friends, prev_next_friends_cursor = get_friends_list(auth, friends_cursor)
-    twitter_followers = get_followers_list(auth)
-    
-
-    for twitter_friend in twitter_friends:
-    
-        twitter_friend['connection_strength'] = '<span style="color:#fd6e6e">Out of Network</span> (Followed by you)' 
-    
-        for twitter_follower in twitter_followers:
-        
-            if twitter_follower['id'] == twitter_friend['id']:
+    try:
+        for friend in api.get_friends():
+            print("friend ", friend._json['name'])  
             
-                twitter_friend['connection_strength'] = '<span style="color:#56b36a">1st</span> (Followed and following)' 
-                break
-
-                
-    context['twitter_friends'] = twitter_friends
-    context['twitter_followers'] = twitter_followers
-    context['friends_cursor'] = prev_next_friends_cursor
-    context['current_cursor'] = friends_cursor
-         
-    return render(request, "twitter/index.html", context)        
+        twitter_friends, prev_next_friends_cursor = get_friends_list(auth, friends_cursor)
+        twitter_followers = get_followers_list(auth)
         
+
+        for twitter_friend in twitter_friends:
+        
+            twitter_friend['connection_strength'] = '<span style="color:#fd6e6e">Out of Network</span> (Followed by you)' 
+        
+            for twitter_follower in twitter_followers:
+            
+                if twitter_follower['id'] == twitter_friend['id']:
+                
+                    twitter_friend['connection_strength'] = '<span style="color:#56b36a">1st</span> (Followed and following)' 
+                    break
+
+                    
+        context['twitter_friends'] = twitter_friends
+        context['twitter_followers'] = twitter_followers
+        context['friends_cursor'] = prev_next_friends_cursor
+        context['current_cursor'] = friends_cursor
+            
+        return render(request, "twitter/index.html", context)        
+    except Exception as e:
+        return HttpResponse(e)
            
 def get_friends_list (auth, cursor):
     import tweepy

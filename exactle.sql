@@ -267,7 +267,7 @@ ALTER TABLE `auth_permission`
 --
 ALTER TABLE `auth_user`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`);
+  ADD UNIQUE KEY `username` (`username`) `email` (`email`);
 
 --
 -- Indexes for table `auth_user_groups`

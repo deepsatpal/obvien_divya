@@ -54,8 +54,9 @@ INSTALLED_APPS = [
     'accounts',
     'contacts_import',
     'userboard',
-    'search_history'
-]
+    'search_history',
+    ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -94,11 +95,15 @@ WSGI_APPLICATION = 'altworkz.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'exactle_workz',
+        'NAME': 'Obvien',
         'USER': 'root',
-        'PASSWORD': 'AltworkzDB1472021?',
+        'PASSWORD': 'Yadav@2922',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
+    #     'OPTIONS': {
+    #         'read_default_file': '/opt/lampp/etc/my.cnf',
+    #        'init_command': "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
+    #    }
     }
 }
 
@@ -111,8 +116,6 @@ ES_PORT = '9200'
 ES_INDEX_URL = f'http://{ES_HOST}:{ES_PORT}/{ES_INDEX}'
 ES_SEARCH_URL = ES_INDEX_URL + '/_search'
 
-
-# Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -150,8 +153,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'altworkzmailmgr@gmail.com'
-EMAIL_HOST_PASSWORD = 'Russia@97'
+EMAIL_HOST_USER = 'ssingh@codenomad.net'
+EMAIL_HOST_PASSWORD = '@Unknown0024'
 # SMTP SETTINGS END #
 
 
@@ -159,13 +162,11 @@ EMAIL_HOST_PASSWORD = 'Russia@97'
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = ( os.path.join(BASE_DIR, 'static'), )
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static/'),
-]
-
-STATIC_ROOT = '/altworkz-project/aw/altworkz-static-files/'
-
+# STATIC_ROOT = '/altworkz-project/aw/altworkz-static-files/'
+STATIC_ROOT = 'aw/aw-static-files/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -183,3 +184,12 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+ELASTICSEARCH_DSL = {
+    'default' : {'hosts': '127.0.0.1:9200'}
+}
+
+
+
+

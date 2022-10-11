@@ -30,8 +30,8 @@ company_name = sys.argv[1]
 if (company_name == "oracle"):
     company = Company("Oracle Corp", "0001341439")
     tree = company.get_all_filings(filing_type="10-K")
-    docs = Company.get_documents(tree, 
-    +=1)
+    docs = Company.get_documents(tree,
+     +=1)
     doc_html = BeautifulSoup(TXTML.to_xml(docs), 'html.parser')
 else:
     docs = open("sample-10Ks/"+company_name+".html", encoding="utf8")

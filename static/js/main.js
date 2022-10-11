@@ -324,11 +324,12 @@ function viewSaveSearch(data) {
 		
         var html;
         $.ajax({
+  
             url: '/elastic-search',
             dataType: 'json',
             data: search_obj,
             success: function (data) {
-
+                
                 user_isa = data.staff;
                 $('.aw_section_recommendation').hide();
                 $('.aw_recent_searches').hide();
@@ -344,7 +345,7 @@ function viewSaveSearch(data) {
                     $('#resultsCarousel').hide();
                 }
                 $('.aw_google_result').hide();
-
+         
                 var firsDegreeContacts = data.first_degree;
                 var secondDegreeContacts = data.second_degree;
                 var thirdDegreeContacts = data.third_degree;

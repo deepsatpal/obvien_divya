@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+# from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.http import Http404
@@ -32,5 +32,8 @@ urlpatterns = [
     path('contacts/', include('contacts_import.urls')),
     path('search-history/', include('search_history.urls')),
     path('scrape_web/', include('scrape_web.urls')),
-    path('twitter/', include('twitter.urls'))
+    path('twitter/', include('twitter.urls')),
+    # path(r'api/v1/invite/', include('drf_simple_invite.urls', namespace='drf_simple_invite')),
+
+    
 ]

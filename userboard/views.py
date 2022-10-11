@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404, JsonRespons
 from contacts_import.models import Contact, Job, School, Organization, Education, Tag, ContactEmail, ContactNumber,\
     SocialProfile, ContactDegree, PersonofInterest, ContactTag, ContactDescription, ContactScrapeSource
 from accounts.models import Profile
+from django.contrib import messages
 from django.contrib.auth.models import User
 from altworkz.settings import ES_INDEX_URL
 # Create your views here.
@@ -25,7 +26,7 @@ def index(request):
                                  LEFT JOIN contact_numbers 	ON contacts.id = contact_numbers.contact_id                                                 
                                  WHERE       contacts.id IN (SELECT      contacts.id           FROM contacts                                               
                                  JOIN        contacts_users cu 	ON cu.contact_id = contacts.id    
-                                 JOIN        accounts_profile ap ON ap.user_id    = cu.user_id                           
+                                 JOIN        unactivated_account_codes ap ON ap.user_id    = cu.user_id                           
                                  JOIN        auth_user 			ON auth_user.id  = ap.user_id                              
                                  WHERE       auth_user.id = ''' + str(request.user.id) + ''')                                     
                                  GROUP BY    contacts.id                                                                                                  
@@ -195,10 +196,11 @@ def update(request, id):
 
         user_contact_id = 0
         is_request_update_profile = request.POST.get('update_profile_request', None)
+        print('hgfb----------:' ,is_request_update_profile)
 
         if is_request_update_profile is not None and is_request_update_profile == 'true':
+            print('hgfb----------:' ,is_request_update_profile is not None and is_request_update_profile == 'true')
             user_contact_id = Profile.objects.get(user_id=request.user.id).contact_id
-			
         details = json.loads(request.POST.get('user_update_details'))
         educations = json.loads(request.POST.get('schools'))
         jobs = json.loads(request.POST.get('organizations'))
@@ -216,17 +218,23 @@ def update(request, id):
         bloomberg_profile_url = details['bloomberg_profile_url']
         tags =  details['tags']
         email_error = ''
+        print('here')
+
         if first_name.strip() is not None:
-            contact, created = Contact.objects.update_or_create(
+            print('-------------')
+            contact , created = Contact.objects.update_or_create(
                 defaults={'user_id': request.user.id, 'first_name': first_name,
-                          'middle_name': middle_name,
-                          'last_name': last_name,
-                          'country': country,
-                          'description': description},
+                        'middle_name': middle_name,
+                        'last_name': last_name,
+                        'country': country,
+                        'description': description,
+                        },
                 id=id,
             )
+        
             contact.users.add(request.user.id)
-
+            print(contact.users.add(request.user.id))
+ 
         if email.strip() != '' and email is not None:
             if ContactEmail.objects.filter(contact_email_primary__iexact=email).exists() and is_request_update_profile != 'true':
                 email_error = 'Email already exists'
@@ -240,6 +248,9 @@ def update(request, id):
 
         if description.strip() != '' and description is not None:
             source_name = ContactDescription.objects.filter(contact_id=id)
+            print('-------ContactDescription-----:' ,description.strip() )
+            print('--------------------------------:',source_name)
+
             if source_name:
                 for source in source_name:
                     source_id = source.source_id
@@ -301,12 +312,14 @@ def update(request, id):
             )
 
         for index, education in enumerate(educations, start=1):
-        
+            global school_abbreviation
             if education:
+                print('------EDU HERE ------')
                 if 'school_id' in education and education['school_id'] != '':
                     school_name = education['school_name'].strip()
                     school_id = education['school_id']
                     school_abbreviation = education['school_abbr'].strip()
+                    print("school_abbreviation: " , school_abbreviation)
                     if school_name != '':
                         School.objects.filter(id=school_id).update(school_name=school_name, school_abbreviation=school_abbreviation)
                 else:
@@ -320,6 +333,7 @@ def update(request, id):
                                 school_abbreviation=school_abbreviation,
                                 defaults={'source_id':6,'platform_id':52131}
                             )
+                            
                             if education['school_name'] != '':
                                 school_name = education['school_name'].strip()
                                 school_abbreviation = education['school_abbr'].strip()
@@ -333,7 +347,7 @@ def update(request, id):
                         except Exception as e:
                             print('Exception occurred while school creation \n')
                             print(e)
-                            
+
                         print("created ", created)
 
 
@@ -418,6 +432,7 @@ def contact_tag_method(tags, contact_id):
 
 
 def update_profile (request, id):
+    print("----working----")
 
     # user = User.objects.get(id=request.user.id)
     # profile = Profile.objects.filter(user_id=request.user.id).values()[0]
@@ -453,8 +468,9 @@ def update_profile (request, id):
         print("contact ", context["contact"])
         
         if request.session.get('first_time_login', None) and request.session['first_time_login'] == True:
-            
-            context['success_redirect_url'] = 'https://altworkz.com/contacts/'
+            context["first_time_login"] = True
+            messages.success(request , "Either you are providing invalid username or password OR your access to this system is approved by admin. In case you belive that you are supplying correct credentials, please contact rak@bridges.com for activation of your account.")
+            context['success_redirect_url'] = 'http://127.0.0.1:8001/contacts/'
             print(context)
 
     except:
@@ -518,40 +534,43 @@ def update_profile (request, id):
 
 def view_profile(request, id):
     try:
-        context = {}
-        new_profile = Profile.objects.filter(user_id=id).values()[0]
-        
-        print('new_profile ', new_profile)
-          
-        context["contact"] = Contact.objects.filter(id=new_profile['contact_id'])[0]
-        
-        print('contact id ', new_profile['contact_id'])
-        print('contact ', context['contact'])
-        
-        
-    except:
-        raise Http404
-    try:
-        context["educations"] = context["contact"].educations.all()
-        context["jobs"] = context["contact"].jobs.all()
-    except:
-        pass
-    try:
-        print('******************************new_profile**************************************')
-        new_profile = Profile.objects.filter(user_id=id).values()[0]
+        try:
+            context = {}
+            new_profile = Profile.objects.filter(user_id=id).values()[0]
+            
+            print('new_profile ', new_profile)
+            
+            context["contact"] = Contact.objects.filter(id=new_profile['contact_id'])[0]
+            
+            print('contact id ', new_profile['contact_id'])
+            print('contact ', context['contact'])
+            
+            
+        except:
+            raise Http404
+        try:
+            context["educations"] = context["contact"].educations.all()
+            context["jobs"] = context["contact"].jobs.all()
+        except:
+            pass
+        try:
+            print('******************************new_profile**************************************')
+            new_profile = Profile.objects.filter(user_id=id).values()[0]
 
-        print(new_profile['contact_id'])
-        context["contact_email"] = ContactEmail.objects.filter(contact_id=new_profile['contact_id'])
+            print(new_profile['contact_id'])
+            context["contact_email"] = ContactEmail.objects.filter(contact_id=new_profile['contact_id'])
 
-    except:
-        pass
-    try:
-        context["contact_number"] = ContactNumber.objects.filter(contact_id=new_profile['contact_id'])
-    except:
-        pass
-    try:
-        context["contact_description"] = context["contact"].contact_description.all()
-    except:
-        pass
+        except:
+            pass
+        try:
+            context["contact_number"] = ContactNumber.objects.filter(contact_id=new_profile['contact_id'])
+        except:
+            pass
+        try:
+            context["contact_description"] = context["contact"].contact_description.all()
+        except:
+            pass
 
-    return render(request, "view_profile.html", {'context': context})
+        return render(request, "view_profile.html", {'context': context})
+    except Exception as e:
+        print("not updated due to", e)
