@@ -33,6 +33,7 @@ urlpatterns = [
     path('search-history/', include('search_history.urls')),
     path('scrape_web/', include('scrape_web.urls')),
     path('twitter/', include('twitter.urls')),
+    path('wikipedia/', include('wikipedia_scrape.urls')),
     # path(r'api/v1/invite/', include('drf_simple_invite.urls', namespace='drf_simple_invite')),
 
     

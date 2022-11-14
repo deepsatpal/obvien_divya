@@ -59,5 +59,3 @@ def createContactProfile(first_name, last_name, job_title, organization, user_id
     )
 
     return contact.id
-
-

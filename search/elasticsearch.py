@@ -28,14 +28,13 @@ from accounts.models import Profile
 
 
 class ElasticSearch(Search):
-
+    print("INSIDE ELASTIC SEARCH CLASS")
     def __init__(self, user_id=''):
 
-        super().__init__()
+        super().__init__() 
 
         self.user_id = user_id
         user_profile = Profile.objects.filter(user_id=self.user_id)
-
         if not list(user_profile):
             self.contact_id = 0
         else:
@@ -211,9 +210,7 @@ class ElasticSearch(Search):
         self.user_query = user_query
         self.filters = self.re_evaluate_filters_values(filters)
 
-        es_response = requests.get(self.request_url,
-                                   headers={'Content-Type': 'application/json'},
-                                   data=self.build_elastic_suggestions_query())
+        es_response = requests.get(self.request_url, headers={'Content-Type': 'application/json'},data=self.build_elastic_suggestions_query())
                                    
         #print("Elastic Suggestions Response ", es_response)
                                    

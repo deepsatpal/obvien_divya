@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'contacts_import',
     'userboard',
     'search_history',
+    'wikipedia_scrape'
     ]
 
 
@@ -97,13 +98,13 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'Obvien',
         'USER': 'root',
-        'PASSWORD': 'Yadav@2922',
-        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
-    #     'OPTIONS': {
-    #         'read_default_file': '/opt/lampp/etc/my.cnf',
-    #        'init_command': "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
-    #    }
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        }
     }
 }
 
@@ -164,8 +165,8 @@ EMAIL_HOST_PASSWORD = '@Unknown0024'
 STATIC_URL = "/static/"
 STATICFILES_DIRS = ( os.path.join(BASE_DIR, 'static'), )
 
-# STATIC_ROOT = '/altworkz-project/aw/altworkz-static-files/'
-STATIC_ROOT = 'aw/aw-static-files/'
+STATIC_ROOT = '/altworkz-project/aw/altworkz-static-files/'
+# STATIC_ROOT = 'aw/aw-static-files/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

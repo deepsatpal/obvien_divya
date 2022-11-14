@@ -45,6 +45,7 @@
             
                 if (search_text.trim() != '') {
                     $.ajax({
+                        console.log("HTML :",search_text.trim())
                         url: 'http://localhost:8000/search/elastic-search-compare',
                         method: 'POST',
                         data: {query: search_text},

@@ -134,10 +134,11 @@ def es_search(request):
     search = {}
     params_dict = parser.parse(request.GET.urlencode())
 
-    print("------- PARAMS -------")
-    print(params_dict)
+    print("here ------- PARAMS -------")
+    print('params_dict :',params_dict)
     try:
         filters = params_dict.get('filters', None)
+        print("filters ------- PARAMS -------" , filters)
         filter_weights = params_dict.get('filter_weights', None)
     except Exception as e:
         print('error : %s' % e)
@@ -546,7 +547,7 @@ def F10K(request):
         'Company': company_sec
     } 
 
-    return render(request, 'search/scrape_results.html', context)
+    return render(request, 'scr/scrape_results.html', context)
 
 def test(request):
 
@@ -669,7 +670,7 @@ def get_cities_list (request):
     return JsonResponse([])
     
 def get_filters_suggestions (request):
-
+    print("Getting filters...")
     context = {}
     search_type = 'elastic'
     search = {}
@@ -684,10 +685,12 @@ def get_filters_suggestions (request):
 
             if search_type == 'elastic':
                 function_type = 'user_defined'
-                search = ElasticSearch(request.user.id)    
+                print("Here also in ELASTICSEARCH")  
+                search = ElasticSearch(request.user.id)  
                 context['filter_suggestions'] = search.fetch_filter_suggestions(request.GET.get('search_str', False), filters)['hits']['hits'] # {'location': 'Manchester', 'industry': 'Engineering'} with filters
                     
                 context['filter_suggestions'] = map(lambda es_result : es_result['_source'], context['filter_suggestions'])
+                print("CONTEXT : " , context['filter_suggestions'] )
                 
         return HttpResponse(json.dumps(list(context['filter_suggestions']), sort_keys=False, indent=4))
     except Exception as e:

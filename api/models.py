@@ -18,6 +18,7 @@ class SearchFilter(models.Model):
         return self.name
 
 
+
 class SearchFilterParameter(models.Model):
     parameter_name = models.CharField(max_length=255)
     field_type = models.CharField(

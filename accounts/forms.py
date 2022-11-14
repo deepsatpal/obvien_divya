@@ -40,4 +40,3 @@ class SignUpForm(UserCreationForm):
         }
         for key, value in placeholders.items():
             self.fields[key].widget.attrs['placeholder'] = value
-
