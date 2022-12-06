@@ -15,7 +15,7 @@ from .elasticsearch import ElasticSearch
 from .graph import *
 from .utilities import *
 
-
+import edgar
 from edgar import Company, TXTML
 from bs4 import BeautifulSoup
 from altworkz.settings import BASE_DIR
@@ -109,7 +109,7 @@ def index(request):
         results['search_results'] = search_results
         results['web_results'] = web_results   
         '''
-        print('working')
+
         # results = json.loads(
         #     open(os.path.join(BASE_DIR, 'search/static/search/json/data.json'), "r").read())
         # context['results'] = results
@@ -124,11 +124,11 @@ def index(request):
 
 def es_search(request):
 
-    os.system('cls')  # clear screen to refresh console messages
+    # os.system('cls')  # clear screen to refresh console messages
 
     context = {}
 
-    search_type = 'web'
+    # search_type = 'web'
     search_type = 'elastic'
 
     search = {}
@@ -205,11 +205,11 @@ def es_search(request):
                         save_search.save()
                         request.session['search_history_id'] = save_search.id
 
-            print('first_search_after_page_load')
-            print(request.GET.get('first_search_after_pageload'))
-            print("------------------------- SEARCH HISTORY ID -------------------------\n " + str(save_search.id))
-            print(request.GET.get(''))
-        ws = WebSearch()
+        #     print('first_search_after_page_load')
+        #     print(request.GET.get('first_search_after_pageload'))
+        #     print("------------------------- SEARCH HISTORY ID -------------------------\n " + str(save_search.id))
+        #     print(request.GET.get(''))
+        # ws = WebSearch()
         page_num = request.GET.get('page_num', 1)
         print("page num in view ", page_num)
         additional_values_to_be_forwarded = {}
@@ -221,14 +221,14 @@ def es_search(request):
             context['view_saved_search'] = True
             
 
-    if filters := params_dict.get('filters', None):
+    # if filters != params_dict.get('filters', None):
         first_degree = []
         second_degree = []
         third_degree = []
         persons_of_interest = []
-    #     query_filters = filters
-    #     print("query filters")
-    #     print(query_filters)        
+        # query_filters = filters
+        # print("query filters")
+        # print(query_filters)        
 
         # return HttpResponse(json.dumps(context), content_type="application/json")
 
@@ -303,7 +303,7 @@ def es_search(request):
 
             context['sec_degree_connection_details'] = {contact_detail['_source']['contact_id']: contact_detail['_source'] for contact_detail in cil}
         
-            print(json.dumps(context['sec_degree_connection_details'], sort_keys=False, indent=4))
+            # print(json.dumps(context['sec_degree_connection_details'], sort_keys=False, indent=4))
 
 
 

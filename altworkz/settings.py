@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     # 'ORM.apps.OrmConfig',
     'search.apps.SearchConfig',
     'scrape_web.apps.ScrapeWebConfig',
-    'api.apps.ApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,8 +54,8 @@ INSTALLED_APPS = [
     'contacts_import',
     'userboard',
     'search_history',
-    'wikipedia_scrape'
-    ]
+    'wikipedia_scrape',
+]
 
 
 MIDDLEWARE = [

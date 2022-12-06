@@ -53,6 +53,8 @@ print(all_shortest_paths_json_pretty)
 f.write(all_shortest_paths_json_pretty)
 f.close()
 
+
+
 all_shortest_paths = json.dumps((all_shortest_paths), sort_keys=True, indent=4)
 print(all_shortest_paths)
 #print(len(all_shortest_paths))

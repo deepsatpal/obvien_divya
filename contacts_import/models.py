@@ -250,7 +250,7 @@ class PersonofInterest(models.Model):
 
     class Meta:
         db_table = "persons_of_interests"
-
+ 
 class FeedbackSearchTerm(models.Model):
     search_term = models.CharField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -259,7 +259,7 @@ class FeedbackSearchTerm(models.Model):
     class Meta:
         db_table = "feedback_search_term"
 
-class UserFeedback(models.Model):
+class UserFeedback(models.Model): 
     feedback = models.SmallIntegerField(null=False)
     contact = models.ForeignKey(
         'Contact', related_name="user_feedback", on_delete=models.CASCADE, )

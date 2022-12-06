@@ -240,7 +240,7 @@ function viewSaveSearch(data) {
 					list: {
 						maxNumberOfElements:job_profile_org_suggest_list.length,
 						hideOnEmptyPhrase: false,
-						match: {
+						match: {                    
 							enabled: true
 						},
 						onClickEvent: function () {
@@ -327,7 +327,6 @@ function viewSaveSearch(data) {
 		
         var html;
         $.ajax({
-            console.log("WORKING")    
             url: '/elastic-search',
             dataType: 'json',
             data: search_obj,
@@ -1039,6 +1038,8 @@ function viewSaveSearch(data) {
 			result_degree_of_connection = 'Out of Network';
 			
 		}
+
+        // result_degree_of_connection = '1st';
 		
         //'<li class="sec"><a href="#"></a></li>'+
         let source_icons = '';

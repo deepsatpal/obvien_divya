@@ -1,13 +1,33 @@
 from bs4 import BeautifulSoup
-from django.http import HttpResponse
+from django.http import HttpResponse , HttpResponseRedirect
 from django.conf import settings
 from django.shortcuts import render
 import requests
 from .models import *
 import pprint 
 pp = pprint.PrettyPrinter(indent=4)
-
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
+
+#------------------------------------------------------#
+@csrf_exempt
+def function_Search(request):
+    if request.method == 'POST':
+        search_str =request.POST.get('search')
+        print("search_str===================>" , search_str)
+        scrape_results_type(request , search_str)
+        # return render(reverse('try_wiki_app:search-results', args=(search_str,)))
+
+    return render(request , "searchcon.html")
+
+
+
+
+
+
+
+
 
 # function Called from main function for type and Industry
 
@@ -38,25 +58,25 @@ def gettypeIndustryAndSave(labels,data,keyword,model):
 # Main Function
 
 
-def scrape_results_type( request ):
+def scrape_results_type( request , search_str ):
 
-    res = requests.get( url='https://en.wikipedia.org/wiki/Elon_Musk')
-    res.encoding = "utf-8"
-    soup = BeautifulSoup(res.text  , 'html.parser')
+            print("search_str===================>" , search_str)
+            res = requests.get( url=f'https://en.wikipedia.org/wiki/{search_str}')
+            res.encoding = "utf-8"
+            soup = BeautifulSoup(res.text  , 'html.parser')
 
-    search_type={}
-    search_type['label']= soup.select(".infobox-label")
-    search_type['data']= soup.select(".infobox-data")
-    
-    typeId = gettypeIndustryAndSave(search_type['label'],search_type['data'],'Type',Type)
-    industryId = gettypeIndustryAndSave(search_type['label'],search_type['data'],'Industry',Industry)
-    scrape_results_information(request,soup,typeId,industryId)
+            search_type={}
+            search_type['label']= soup.select(".infobox-label")
+            search_type['data']= soup.select(".infobox-data")
+            
+            typeId = gettypeIndustryAndSave(search_type['label'],search_type['data'],'Type',Type)
+            industryId = gettypeIndustryAndSave(search_type['label'],search_type['data'],'Industry',Industry)
+            scrape_results_information(request,soup,typeId,industryId)
 
-    print("typeId===================",typeId)
-    print("industryId===================",industryId)
-    return
-    
-    
+            print("typeId===================",typeId)
+            print("industryId===================",industryId)
+            return
+        
 
 
 
@@ -90,17 +110,14 @@ def scrape_results_information(request , soup ,typeId=None , industryId=None):
 
 
 
-
-
-
+ 
 def scrape_results_Content_sub(request , soup , Information_Id):
 
-    obj = {}
     object = dict()
-    saveobject = {}
     info_key=''
     obj_list2 = []
     obj_list1 = []
+
 
     i = ''
     toc2 = soup.findAll('span' , {'class': 'tocnumber'})
@@ -122,19 +139,16 @@ def scrape_results_Content_sub(request , soup , Information_Id):
     Info_ID = Information.objects.get(id = Information_Id)
     print("Information_Id===================>" , Info_ID)
 
-    for keys , value in object.items():
-        if len(keys)==1:
-            save_Content = Content_type.objects.create(keyID = keys , keyValue = value ,Info_Key = Info_ID)
-            save_Content.save()
-            save_content_ID = save_Content.id
+    
     # '''---------------------------------------------------------<<<???>>>'''
-
 
 
     headingValue3 = ''
     headingValue4 = ''
+    headingValue2 = ''
     foundH3 = False
     foundH4 = False
+    foundH2 = False
     dict3 = {}
 
     about = {}
@@ -153,22 +167,36 @@ def scrape_results_Content_sub(request , soup , Information_Id):
             headingValue4 = para.get_text()
             about[headingValue4] = ''
             foundH4 = True  
-           
+            
+        if para.name == 'h2':
+            headingValue2 = para.get_text()
+            about[headingValue2] = ''
+            foundH2 = True  
         if para.name=='p' :
             if foundH3:
                 about[headingValue3] += para.get_text()
 
             if foundH4:
                 about[headingValue4] += para.get_text() 
-    Content_ID = Content_type.objects.get(id = save_content_ID)
-    
-    for keyss , values  in about.items():
-        for it , k in object.items():
-            if keyss == k:
-                print('i-----------> ' , it ,  keyss == k)
 
-                level_length = len(it.split("_"))
-                print(level_length)
-                SubContent_sa = SubContent_type.objects.create(Sub_keyID = it , Sub_keyValue = keyss , SubKey_Description = values  , level_Info =level_length ,Content_Key = Content_ID)
-                SubContent_sa.save()
-                print("done")
+            if foundH2 and not foundH3 and not foundH4:
+                about[headingValue2] += para.get_text() 
+
+    
+    for keys , value in object.items():
+        if len(keys)==1:
+            sve_Content = Content_type.objects.create(keyID = keys , keyValue = value ,Info_Key = Info_ID)
+            save_Content.save()
+            save_content_ID = save_Content.id
+            
+        if len(keys)>=1:
+            for keyss , values  in about.items():
+                if keyss==value:
+                    if values != '':
+                        # print()
+                        print("keyss===================>" , keyss ,  "VALUES================>" , value)
+                        content_type =  Content_type.objects.all().get(id=save_content_ID)
+                        level_length = len(keys.split("_"))
+                        SubContent_sa = SubContent_type.objects.create(Sub_keyID = keys , Sub_keyValue = keyss , SubKey_Description = values  , level_Info =level_length,Content_Key = content_type)
+                        SubContent_sa.save()
+   

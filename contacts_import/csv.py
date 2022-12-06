@@ -274,7 +274,7 @@ def add_csv_row (csv_row, contact_type, tags, request, index):
                     poi_id=contact.id
                 )
 
-            else:
+            else: 
 
                 text = """<h1>Contact Type Error</h1>"""
 

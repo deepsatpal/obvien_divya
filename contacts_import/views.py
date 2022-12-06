@@ -168,7 +168,7 @@ def import_csv(request):
             total_rows += 1
             rejection_reasons = []
                         
-            if header_index > 0:
+            if heaedr_index > 0:
                 
                 header_index -= 1
                 continue 

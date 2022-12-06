@@ -29,7 +29,7 @@ import urllib.request as urllib2
 from django.shortcuts import HttpResponse
 #import pickle
 from selenium import webdriver
-from api.models import SearchFilter
+from Bloombergapi.models import SearchFilter
 
 
 
@@ -48,7 +48,7 @@ from selenium.webdriver.common.keys import Keys
 from search.elasticsearch import ElasticSearch
 from contacts_import.models import Contact, Job, School, Organization, Education, Tag, ContactTag, \
     SocialProfile, ContactDegree, PersonofInterest
-# from contacts_import.views import school_method, organization_method
+from contacts_import.views import school_method, organization_method
 
 ua = UserAgent() # From here we generate a random user agent
 proxies = [] # Will contain proxies [ip, port]
@@ -103,7 +103,7 @@ def do_google_search(query, platform):
             # extract the page url
             link = search_item.get("link")
             urls.append(link)
-    #json_urls = json.dumps(urls)
+    #json_urls = json.dumps(urls) 
     return urls
     #return HttpResponse(json_urls, content_type="application/json")
 

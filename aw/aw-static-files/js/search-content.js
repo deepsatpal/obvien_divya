@@ -25,7 +25,7 @@ function search() {
     var html;
     $.ajax({
         // url: '/api/search',
-        url: '/search/elastic-search',
+        url: '/search/elastic-search', 
         // contentType: "application/json",
         dataType : 'json',
         data: search_obj,

@@ -35,8 +35,7 @@ class SignUpForm(UserCreationForm):
             'last_name': 'Last Name',
             'job_title': 'Job Title',
             'organization': 'Organization Name',
-
-
         }
         for key, value in placeholders.items():
             self.fields[key].widget.attrs['placeholder'] = value
+

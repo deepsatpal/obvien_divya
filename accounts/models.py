@@ -17,7 +17,6 @@ class AccountActivation(models.Model):
 class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE,primary_key = True)
-    
     first_name = models.CharField(max_length=30, blank=False )
     last_name = models.CharField(max_length=30, blank=False )
     job_title = models.CharField(max_length=30, blank=False )
@@ -59,3 +58,5 @@ def createContactProfile(first_name, last_name, job_title, organization, user_id
     )
 
     return contact.id
+
+

@@ -372,7 +372,7 @@ function viewSaveSearch(data) {
 
 
                     $.each(data.results, function () {
-                        console.log(this);
+                        console.log("this--->" , this);
                         contact_id_list.push(this['contact_id']);
                         if (this != false) {
                             if (this['photo'] === undefined || this['photo'] == '' || this['photo'] === null) {
@@ -741,7 +741,7 @@ function viewSaveSearch(data) {
 		if (e.type == 'click' || e.which == 13) {
 
             e.preventDefault();
-			perform_new_search();
+		 	perform_new_search();
 					
 		}
     });
@@ -1017,9 +1017,10 @@ function viewSaveSearch(data) {
         let sec_source_link = empty_if_invalid_val(result_obj.sec_source_link);
         let sec_link_html = '';
 		let result_degree_of_connection = '';
+        console.log(result_photo , result_full_name , result_location , result_job_location ,result_organization_title , result_school )
 		
 		if (firsDegreeContacts.indexOf(result_obj.contact_id) > -1) {
-			
+		
 			result_degree_of_connection = '1st';
 			
 		}
@@ -1136,7 +1137,8 @@ function viewSaveSearch(data) {
 		let confidence_score = result_obj['confidence_score']['calculated_score'];
 		console.log('confidence score ');
 		console.log(confidence_score);
-						
+					
+        
         var html = `<div class="col-md-6">
             <article class="aw_card">
 				${contact_type_html}

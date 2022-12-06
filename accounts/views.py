@@ -227,7 +227,7 @@ def activate_account (request , activation_code   ):
         ) 
     except Exception as e:
     
-        print("e ", e),
+        print("e ", e)
 
         raise 404("Invalid Page")
     return HttpResponse(request , 'Account activated. The user has also been notified by email.' )
