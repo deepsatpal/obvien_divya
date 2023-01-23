@@ -29,7 +29,7 @@ import urllib.request as urllib2
 from django.shortcuts import HttpResponse
 #import pickle
 from selenium import webdriver
-from Bloombergapi.models import SearchFilter
+from .models import SearchFilter
 
 
 
@@ -109,7 +109,8 @@ def do_google_search(query, platform):
 
 
 def scrape(request):
-    url = request.GET['url']
+    #url = request.GET['url']
+    url = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyB3dtqBhzm2BoMwsw9RMKImPOIHIEmZrO4&cx=008566010345248266130:wjnu19fbysg&q=microsoftceo&start=1'
     platform = request.GET['platform']
     # before scrapping check if url was scrapped earlier, in that case skip it
     is_url_scrapped(url, platform)
@@ -123,6 +124,7 @@ def scrape(request):
         profile_data = scrape_sec(url)
     if profile_data is not False and platform == 'bloomberg':
         json_data = json.dumps(profile_data)
+        print(json_data)
         do_db_save(profile_data)
     return HttpResponse(json_data, content_type="application/json")
 

@@ -2106,9 +2106,9 @@ section.aw_section_user_profile .card img.header-image {
 	align-items: center;
 	-ms-flex-pack: center;
 	justify-content: center;
-	position: absolute;
+	/* position: sticky;
 	bottom: 0;
-	left: 0;
+	left: 0; */
 	width: 100%;
 }
 

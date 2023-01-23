@@ -3,7 +3,7 @@
 {% block 'css' %}
 
 	<link href="{% static 'css/tags-input.css' %}" rel="stylesheet" />
-
+<link href="https://unpkg.com/intro.js/minified/introjs.min.css" rel="stylesheet"> 
 {% endblock %}
 
 <!-- ======= user board Section ======= -->
@@ -198,6 +198,9 @@
 			<button class="btn btn-primary" type="button" id="updateUserContact">Update</button>
 		</form>
 	</div>
+	
+
+
 <!--	-->
 <!--	<div id="dialog" title="Basic dialog">-->
 <!--	  <p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the &apos;x&apos; icon.</p>-->
@@ -207,20 +210,59 @@
 {% endblock %} 
 
 {% block 'js' %}
+<script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Lato:400,700&display=swap" rel="stylesheet"> 
+<link href="https://unpkg.com/intro.js/minified/introjs.min.css" rel="stylesheet"> 
+<link href="https://unpkg.com/intro.js/themes/introjs-modern.css" rel="stylesheet"> 
+
 
 	<script type="text/javascript" src="{% static 'js/tags-input.js' %}"></script>
+	<script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
 	<script>
 	
 		$(document).ready(function () {
 		
 			{% if context.success_redirect_url %}
 				
-				$('#modalIntro h5.modal-title').text('Profile Information');
-				$('#modalIntro #modal-intro-body').html('<div>Add your Education and Work History</div>');
-				$('#modalIntro').modal('show');
-									
+
+
+			introJs().setOptions({
+				showProgress: true,
+				disableInteraction: true,
+				tooltipPosition : 'top',
+				steps:[{
+					title : "Welcome",
+					intro : "Welcome Altworkz's",
+					position: `left`
+
+				},
+				{
+					element : '.form-control',
+					title : "Search Capability.",
+					intro : "You can Search from various Platforms.",
+					position : "top"
+				},
+				{
+					tooltipClass : '.aw_brand',
+					title : "Logo",
+					intro : "Link to Home Page.",
+					position : "top"
+				},
+				{
+					element : '.aw_section_header',
+					title : "Contacts Upload",
+					intro : "You can Upload the contacts from various Platforms.",
+					position : "top"
+				},
+
+				]
+			}).start(); 
+			introJs().oncomplete(function(){
+				introJs().stop();
+			});
+
+			console.log("Working")
 			{% endif %}
-				
 		});
 	
 		let edu_num = 1;
@@ -484,6 +526,7 @@
 			//swal('Test');
 
 		{% endif %}
+
 
 
 	</script>

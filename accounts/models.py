@@ -9,10 +9,12 @@ from django.conf import settings
 
 
 class AccountActivation(models.Model):
-      activation_string = models.CharField(max_length=50,default='')
-      user_id = models.IntegerField()
-      useremail = models.EmailField(max_length=30 , unique=True)
-
+    activation_string = models.CharField(max_length=50,default='')
+    user_id = models.IntegerField()
+ 
+    class Meta:
+        db_table = "unactivated_account_codes"   
+    
 
 class Profile(models.Model):
 
@@ -26,14 +28,6 @@ class Profile(models.Model):
     contact_id = models.IntegerField(blank=True, default=0)
     is_first_login = models.IntegerField(default=1)
 
-    
-  
-
-    activation_string = models.CharField(max_length=50, default='' ,blank=False)
-    
-    
-    class Meta:
-        db_table = "unactivated_account_codes"
 
 
 

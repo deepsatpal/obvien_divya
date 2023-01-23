@@ -5,17 +5,60 @@
 <!-- ======= csv Section ======= -->
 {% block 'mainblock' %}
 
-		{% if messages %}
-		<div class="alert alert-success" role="" >
-			{% for message in messages %}
-					{{ message }}
-			{% endfor %}
-		</div>
-	{% endif %}
+		{% comment %} {% if messages %} {% endcomment %}
+		{% comment %} <div class="alert alert-success" role="" > {% endcomment %}
+			{% comment %} {% for message in messages %} {% endcomment %}
+					{% comment %} {{ message }} {% endcomment %}
+			{% comment %} {% endfor %} {% endcomment %}
+		{% comment %} </div> {% endcomment %}
+	{% comment %} {% endif %}  {% endcomment %}
 	<section class="aw_section aw_section_csv">
 
+
+
+	{% comment %} {% if  user.is_authenticated and request.path == "/contacts" %} {% endcomment %}
+	<div class="aw_searchbar">
+		<div class="container">
+			<div class="aw_searchbar_inner">
+				<div class="aw_search_box">
+					{% csrf_token %}
+					<div class="aw_search_field">
+						<i class="fas fa-search"></i>
+						<input type="text" class="form-control" name="search" id="search-text" placeholder="Search" />
+						<button type="button" class="search-submit">
+							<i class="fas fa-arrow-right"></i>
+						</button>
+					</div>
+					<div class="search-validation-msg">Please enter search string</div>
+				</div>
+				<div class="aw_filters">
+					<div class="aw_filter_selected">
+						<ul id="applied-filters-ul">
+						</ul>
+					</div>
+				</div>
+			</div> <!-- /.aw_searchbar_inner -->
+		</div> <!-- /.container -->
+	</div> <!-- /.aw_searchbar -->
+	{% comment %} {% endif %} {% endcomment %}
+
+	
+			{% comment %} <div class="aw_search_box">
+				{% csrf_token %}
+				<div class="aw_search_field">
+					<i class="fas fa-search"></i>
+					<input type="text" class="form-control" name="search" id="search-text" placeholder="Search" />
+					<button type="button" class="search-submit">
+						<i class="fas fa-arrow-right"></i>
+					</button>
+				</div>
+				<div class="search-validation-msg">Please enter search string</div>
+			</div>  {% endcomment %}
+
+			
 		<div class="aw_section_header">
-			<h2 class="aw_section_title">Import Contacts</h2>
+			
+			<h2 class="aw_section_title" >Import Contacts</h2>
 			<div class="aw_section_actions">
 				{% comment %} <a href="{% url 'import_csv_sheet' %}" class="btn btn-primary">Add CSV Contacts</a> {% endcomment %}
 			</div> 
@@ -30,6 +73,9 @@
 					<li><a href="/contacts/linkedin-contacts-import">LinkedIn</a></li>
 				</ul>
 			</div>
+		{% comment %} </div>
+	</div> {% endcomment %}
+</div>
 			<div class="aw_download_template">
 				<a href="{% url 'download-csv-template' %}" class="btn btn-success btn_download_template">Download Template</a>
 			</div>

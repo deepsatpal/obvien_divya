@@ -52,11 +52,11 @@ function viewSaveSearch(data) {
         search_obj['filters'] = search_view_obj['filters'];
         var filters = JSON.parse(seachFilters);
         var num_of_filters = Object.keys(filters).length;
-		
+
 
         for (i = 0; i < Object.keys(filters).length; i++) {
-            
-			var filter_name = Object.keys(filters)[i];
+           
+var filter_name = Object.keys(filters)[i];
             var filter_value = filters[filter_name];
 
             search_view_obj['filters'][filter_name] = filter_value;
@@ -152,26 +152,26 @@ function viewSaveSearch(data) {
     });
 
     var unqiue_photo_list = []; // temp arrangement for duplicate removals
-	
-	function perform_new_search () {
-		
-		current_page = 1;
-		search(1);
-		
-	}
+
+function perform_new_search () {
+
+current_page = 1;
+search(1);
+
+}
 
     function search(page_num=1) {
 
         var search_str = $('#search-text').val();
 
         if (search_str == '') {
-            
-			$('.search-validation-msg').show();
+           
+$('.search-validation-msg').show();
             $('#search-text').css({'border': '1px solid #d05353'});
-            
-			return false;
-        
-		}
+           
+return false;
+       
+}
 
         $('.aw_wrapper').preloader({
             text: 'Please Wait...',
@@ -184,13 +184,13 @@ function viewSaveSearch(data) {
         search_obj['search_str'] = search_str;
         search_obj['first_search_after_pageload'] = first_search_after_pageload;
         search_obj['page_num'] = page_num;
-		console.log('selected page ', page_num);
+console.log('selected page ', page_num);
 
         if ('filters' in search_obj && search_obj['filters'].length == 0) {
-            
-			delete search_obj['filters'];
-        
-		}
+           
+delete search_obj['filters'];
+       
+}
 
         search_filters_array = search_obj;
         execute_search(search_obj);
@@ -202,134 +202,133 @@ function viewSaveSearch(data) {
         let search_feedback = get_search_feedback();
 
         show_loader();
-		
-		$.ajax({
-			url: '/get-filter-suggestions',
-			dataType: 'json',
-			data: search_obj,
-			success: function (data) {
-				
-				let job_profile_org_suggest_list = [];
-				let job_profile_tilte_suggest_list = [];
-				let edu_profile_school_suggest_list = [];
-				let edu_profile_degree_suggest_list = [];
-				data.forEach(job_edu_profile => {
-					if ('job_profile' in job_edu_profile) {
-						if (job_edu_profile['job_profile'][0]['organization_'] !== null) {
-							job_profile_org_suggest_list.push(job_edu_profile['job_profile'][0]['organization_'])
-						}
-						if (job_edu_profile['job_profile'][0]['organization_title_'] !== null) {
-							job_profile_tilte_suggest_list.push(job_edu_profile['job_profile'][0]['organization_title_']);									
-						}									
-					}
-					if ('edu_profile' in job_edu_profile) {
-						if (job_edu_profile['edu_profile'][0]['school_'] !== null) {
-							edu_profile_school_suggest_list.push(job_edu_profile['edu_profile'][0]['school_'])
-						}	
-						if (job_edu_profile['edu_profile'][0]['degree_'] !== null) {
-							edu_profile_degree_suggest_list.push(job_edu_profile['edu_profile'][0]['degree_'])
-						}						
-					}
-				});
 
-				$('#organization_name').easyAutocomplete({
-					data: job_profile_org_suggest_list.filter((value, index, self) => self.indexOf(value) === index).sort(sortFilterList),
-					list: {
-						maxNumberOfElements:job_profile_org_suggest_list.length,
-						hideOnEmptyPhrase: false,
-						match: {
-							enabled: true
-						},
-						onClickEvent: function () {
-							change_field_value_on_selection('organization_name');
-						},
-						onSelectItemEvent: function () {
-							change_field_value_on_selection('organization_name', 'onSelectItemEvent');
-						},
-						onChooseEvent: function () {
-							change_field_value_on_selection('organization_name');
-						}
-					},
-					adjustWidth: false,
-				});
+$.ajax({
+url: '/get-filter-suggestions',
+dataType: 'json',
+data: search_obj,
+success: function (data) {
 
-				$('#school_name').easyAutocomplete({
-					data: edu_profile_school_suggest_list.filter((value, index, self) => self.indexOf(value) === index).sort(sortFilterList),
-					list: {
-						maxNumberOfElements:edu_profile_school_suggest_list.length,
-						hideOnEmptyPhrase: false,
-						match: {
-							enabled: true
-						},
-						onClickEvent: function () {
-							change_field_value_on_selection('school_name');
-						},
-						onSelectItemEvent: function () {
-							change_field_value_on_selection('school_name', 'onSelectItemEvent');
-						},
-						onChooseEvent: function () {
-							change_field_value_on_selection('school_name');
-						}
-					},
-					adjustWidth: false,
-				});
-				
-				console.log('edu degree ', edu_profile_degree_suggest_list);
+let job_profile_org_suggest_list = [];
+let job_profile_tilte_suggest_list = [];
+let edu_profile_school_suggest_list = [];
+let edu_profile_degree_suggest_list = [];
+data.forEach(job_edu_profile => {
+if ('job_profile' in job_edu_profile) {
+if (job_edu_profile['job_profile'][0]['organization_'] !== null) {
+job_profile_org_suggest_list.push(job_edu_profile['job_profile'][0]['organization_'])
+}
+if (job_edu_profile['job_profile'][0]['organization_title_'] !== null) {
+job_profile_tilte_suggest_list.push(job_edu_profile['job_profile'][0]['organization_title_']);
+}
+}
+if ('edu_profile' in job_edu_profile) {
+if (job_edu_profile['edu_profile'][0]['school_'] !== null) {
+edu_profile_school_suggest_list.push(job_edu_profile['edu_profile'][0]['school_'])
+}
+if (job_edu_profile['edu_profile'][0]['degree_'] !== null) {
+edu_profile_degree_suggest_list.push(job_edu_profile['edu_profile'][0]['degree_'])
+}
+}
+});
 
-				$('#degree').easyAutocomplete({
-					data: edu_profile_degree_suggest_list.filter((value, index, self) => self.indexOf(value) === index).sort(sortFilterList),
-					list: {
-						maxNumberOfElements:edu_profile_degree_suggest_list.length,
-						hideOnEmptyPhrase: false,
-						match: {
-							enabled: true
-						},
-						onClickEvent: function () {
-							change_field_value_on_selection('degree');
-						},
-						onSelectItemEvent: function () {
-							change_field_value_on_selection('degree', 'onSelectItemEvent');
-						},
-						onChooseEvent: function () {
-							change_field_value_on_selection('school_name');
-						}
-					},
-					adjustWidth: false,
-				});
+$('#organization_name').easyAutocomplete({
+data: job_profile_org_suggest_list.filter((value, index, self) => self.indexOf(value) === index).sort(sortFilterList),
+list: {
+maxNumberOfElements:job_profile_org_suggest_list.length,
+hideOnEmptyPhrase: false,
+match: {
+enabled: true
+},
+onClickEvent: function () {
+change_field_value_on_selection('organization_name');
+},
+onSelectItemEvent: function () {
+change_field_value_on_selection('organization_name', 'onSelectItemEvent');
+},
+onChooseEvent: function () {
+change_field_value_on_selection('organization_name');
+}
+},
+adjustWidth: false,
+});
 
-				
-				$('#job_title').easyAutocomplete({
-					data: job_profile_tilte_suggest_list.filter((value, index, self) => self.indexOf(value) === index).sort(sortFilterList),
-					list: {
-						maxNumberOfElements:job_profile_tilte_suggest_list.length,
-						hideOnEmptyPhrase: false,
-						match: {
-							enabled: true
-						},
-						onClickEvent: function () {
-							change_field_value_on_selection('job_title');
-						},
-						onSelectItemEvent: function () {
-							change_field_value_on_selection('job_title', 'onSelectItemEvent');
-						},
-						onChooseEvent: function () {
-							change_field_value_on_selection('job_title');
-						}
-					},
-					adjustWidth: false,
-				});				
-				
-			}
-		});			
-		
+$('#school_name').easyAutocomplete({
+data: edu_profile_school_suggest_list.filter((value, index, self) => self.indexOf(value) === index).sort(sortFilterList),
+list: {
+maxNumberOfElements:edu_profile_school_suggest_list.length,
+hideOnEmptyPhrase: false,
+match: {
+enabled: true
+},
+onClickEvent: function () {
+change_field_value_on_selection('school_name');
+},
+onSelectItemEvent: function () {
+change_field_value_on_selection('school_name', 'onSelectItemEvent');
+},
+onChooseEvent: function () {
+change_field_value_on_selection('school_name');
+}
+},
+adjustWidth: false,
+});
+
+console.log('edu degree ', edu_profile_degree_suggest_list);
+
+$('#degree').easyAutocomplete({
+data: edu_profile_degree_suggest_list.filter((value, index, self) => self.indexOf(value) === index).sort(sortFilterList),
+list: {
+maxNumberOfElements:edu_profile_degree_suggest_list.length,
+hideOnEmptyPhrase: false,
+match: {
+enabled: true
+},
+onClickEvent: function () {
+change_field_value_on_selection('degree');
+},
+onSelectItemEvent: function () {
+change_field_value_on_selection('degree', 'onSelectItemEvent');
+},
+onChooseEvent: function () {
+change_field_value_on_selection('school_name');
+}
+},
+adjustWidth: false,
+});
+
+
+$('#job_title').easyAutocomplete({
+data: job_profile_tilte_suggest_list.filter((value, index, self) => self.indexOf(value) === index).sort(sortFilterList),
+list: {
+maxNumberOfElements:job_profile_tilte_suggest_list.length,
+hideOnEmptyPhrase: false,
+match: {
+enabled: true
+},
+onClickEvent: function () {
+change_field_value_on_selection('job_title');
+},
+onSelectItemEvent: function () {
+change_field_value_on_selection('job_title', 'onSelectItemEvent');
+},
+onChooseEvent: function () {
+change_field_value_on_selection('job_title');
+}
+},
+adjustWidth: false,
+});
+
+}
+});
+
         var html;
         $.ajax({
-  
             url: '/elastic-search',
             dataType: 'json',
             data: search_obj,
             success: function (data) {
-                
+
                 user_isa = data.staff;
                 $('.aw_section_recommendation').hide();
                 $('.aw_recent_searches').hide();
@@ -345,17 +344,17 @@ function viewSaveSearch(data) {
                     $('#resultsCarousel').hide();
                 }
                 $('.aw_google_result').hide();
-         
+
                 var firsDegreeContacts = data.first_degree;
                 var secondDegreeContacts = data.second_degree;
                 var thirdDegreeContacts = data.third_degree;
-				
-				var total_results = data.total_results;
-								
+
+var total_results = data.total_results;
+
                 if (data.results.length > 0) {
-					
-		
-															
+
+
+
                     $('#resultsCarousel').show();
                     bulleteImg = [];
                     unqiue_photo_list = [];
@@ -365,14 +364,16 @@ function viewSaveSearch(data) {
                     let schools_list = [];
                     let industries_list = [];
                     let platforms_list = [];
-					let org_cities_list = [];
-					let org_countries_list = [];
+let org_cities_list = [];
+let org_countries_list = [];
 //                    let org_cities_list = ['Lahore', 'Los Angeles'];
 //                    let org_countries_list = ['Pakistan', 'United States'];
 
 
                     $.each(data.results, function () {
-                        console.log("this--->" , this);
+
+                        console.log(this);
+
                         contact_id_list.push(this['contact_id']);
                         if (this != false) {
                             if (this['photo'] === undefined || this['photo'] == '' || this['photo'] === null) {
@@ -387,127 +388,127 @@ function viewSaveSearch(data) {
                                 }
                                 result_count++;
                             //}
-							
+
                         }
-						
-						$('#light-pagination').pagination({
-							items: total_results,
-							itemsOnPage: 20,
-							currentPage: current_page,
-							cssStyle: 'light-theme',
-							onPageClick: function (page_num, event) {
-								current_page = page_num;
-								search(page_num);
-							}
-						});							
-							
+
+$('#light-pagination').pagination({
+items: total_results,
+itemsOnPage: 20,
+currentPage: current_page,
+cssStyle: 'light-theme',
+onPageClick: function (page_num, event) {
+current_page = page_num;
+search(page_num);
+}
+});
+
                     });
-										
-					
-					/*
-					
-					var filters_id_list = {
-						'job_title' : job_titles_list, 
-						'industry': industries_list, 
-						'organization_name': companies_list, 
-						'school_name': schools_list
-					};					
-					
-					for (let filter_id_list_item in filters_id_list) {
-						
-						$(`#${filter_id_list_item}`).easyAutocomplete({
-							data: job_titles_list.filter((value, index, self) => self.indexOf(value) === index),
-							list: {
-								maxNumberOfElements:job_titles_list.length,
-								hideOnEmptyPhrase: false,
-								match: {
-									enabled: true
-								},
-								onClickEvent: function () {
-									change_field_value_on_selection(`${filter_id_list_item}`);
-								},
-								onSelectItemEvent: function () {
-									change_field_value_on_selection(`${filter_id_list_item}`, 'onSelectItemEvent');
-								},
-								onChooseEvent: function () {
-									change_field_value_on_selection(`${filter_id_list_item}`);
-								}
-							},
-							adjustWidth: false,
-						});						
-						
-						
-						console.log('initializing list filter item ', filter_id_list_item);
-						
-					}
-					*/
+
+
+/*
+
+var filters_id_list = {
+'job_title' : job_titles_list,
+'industry': industries_list,
+'organization_name': companies_list,
+'school_name': schools_list
+};
+
+for (let filter_id_list_item in filters_id_list) {
+
+$(`#${filter_id_list_item}`).easyAutocomplete({
+data: job_titles_list.filter((value, index, self) => self.indexOf(value) === index),
+list: {
+maxNumberOfElements:job_titles_list.length,
+hideOnEmptyPhrase: false,
+match: {
+enabled: true
+},
+onClickEvent: function () {
+change_field_value_on_selection(`${filter_id_list_item}`);
+},
+onSelectItemEvent: function () {
+change_field_value_on_selection(`${filter_id_list_item}`, 'onSelectItemEvent');
+},
+onChooseEvent: function () {
+change_field_value_on_selection(`${filter_id_list_item}`);
+}
+},
+adjustWidth: false,
+});
+
+
+console.log('initializing list filter item ', filter_id_list_item);
+
+}
+*/
 
 
 
                     $('#industry').easyAutocomplete({
                         data: industries_list.filter((value, index, self) => self.indexOf(value) === index),
                         list: {
-							maxNumberOfElements:industries_list.length,
-							hideOnEmptyPhrase: false,
+maxNumberOfElements:industries_list.length,
+hideOnEmptyPhrase: false,
                             match: {
                                 enabled: true
                             },
-							onClickEvent: function () {
-								change_field_value_on_selection('industry');
-							},
-							onSelectItemEvent: function () {
-								change_field_value_on_selection('industry', 'onSelectItemEvent');
-							},
-							onChooseEvent: function () {
-								change_field_value_on_selection('industry');
-							}
+onClickEvent: function () {
+change_field_value_on_selection('industry');
+},
+onSelectItemEvent: function () {
+change_field_value_on_selection('industry', 'onSelectItemEvent');
+},
+onChooseEvent: function () {
+change_field_value_on_selection('industry');
+}
                         },
                         adjustWidth: false,
                     });
-					// organization name suggestion list
-					/*
+// organization name suggestion list
+/*
                     $('#organization_name').easyAutocomplete({
                         data: companies_list.filter((value, index, self) => self.indexOf(value) === index),
                         list: {
-							maxNumberOfElements:companies_list.length,
-							hideOnEmptyPhrase: false,
+maxNumberOfElements:companies_list.length,
+hideOnEmptyPhrase: false,
                             match: {
                                 enabled: true
                             },
-							onClickEvent: function () {
-								change_field_value_on_selection('organization_name');
-							},
-							onSelectItemEvent: function () {
-								change_field_value_on_selection('organization_name', 'onSelectItemEvent');
-							},
-							onChooseEvent: function () {
-								change_field_value_on_selection('organization_name');
-							}
+onClickEvent: function () {
+change_field_value_on_selection('organization_name');
+},
+onSelectItemEvent: function () {
+change_field_value_on_selection('organization_name', 'onSelectItemEvent');
+},
+onChooseEvent: function () {
+change_field_value_on_selection('organization_name');
+}
                         },
                         adjustWidth: false,
                     });
-					// school name suggestion list
+// school name suggestion list
                     $('#school_name').easyAutocomplete({
                         data: schools_list.filter((value, index, self) => self.indexOf(value) === index),
                         list: {
-							maxNumberOfElements:schools_list.length,
-							hideOnEmptyPhrase: false,
+maxNumberOfElements:schools_list.length,
+hideOnEmptyPhrase: false,
                             match: {
                                 enabled: true
                             },
-							onClickEvent: function () {
-								change_field_value_on_selection('school_name');
-							},
-							onSelectItemEvent: function () {
-								change_field_value_on_selection('school_name', 'onSelectItemEvent');
-							},
-							onChooseEvent: function () {
-								change_field_value_on_selection('school_name');
-							}
+onClickEvent: function () {
+change_field_value_on_selection('school_name');
+},
+onSelectItemEvent: function () {
+change_field_value_on_selection('school_name', 'onSelectItemEvent');
+},
+onChooseEvent: function () {
+change_field_value_on_selection('school_name');
+}
                         },
                         adjustWidth: false,
                     });
-					*/	
+*/
 
                     let file_tag_list = '';
                     let file_tags_suggestions_count = data.file_tags_suggestions.length;
@@ -539,7 +540,7 @@ function viewSaveSearch(data) {
                                     if (file_tags_checkbox_list.indexOf(data.file_tags_suggestions[ftl]) == -1) {
 
                                         ind_filetag_checked = '';
-										
+
                                     }
 
                                 }
@@ -559,93 +560,93 @@ function viewSaveSearch(data) {
                     $('#file_tag').easyAutocomplete({
                         data: data.file_tags_suggestions,
                         list: {
-							maxNumberOfElements:data.file_tags_suggestions.length,
-							hideOnEmptyPhrase: false,
+maxNumberOfElements:data.file_tags_suggestions.length,
+hideOnEmptyPhrase: false,
                             match: {
                                 enabled: true
                             },
-							onClickEvent: function () {
-								change_field_value_on_selection('file_tag');
-							},
-							onSelectItemEvent: function () {
-								change_field_value_on_selection('file_tag', 'onSelectItemEvent');
-							},
-							onChooseEvent: function () {
-							    change_field_value_on_selection('file_tag');
-							}
+onClickEvent: function () {
+change_field_value_on_selection('file_tag');
+},
+onSelectItemEvent: function () {
+change_field_value_on_selection('file_tag', 'onSelectItemEvent');
+},
+onChooseEvent: function () {
+   change_field_value_on_selection('file_tag');
+}
                         },
                         adjustWidth: false,
                     });
 
 
-					function change_field_value_on_selection (field_id, event_type = '') {
+function change_field_value_on_selection (field_id, event_type = '') {
 
-						let selected_value = $(`#${field_id}`).getSelectedItemData();
+let selected_value = $(`#${field_id}`).getSelectedItemData();
 
-						if (event_type == 'onSelectItemEvent') {
-							$(`#${field_id}`).val(selected_value);
-						}
-						else {
-							$(`#${field_id}`).val(selected_value).trigger('change');
-						}
+if (event_type == 'onSelectItemEvent') {
+$(`#${field_id}`).val(selected_value);
+}
+else {
+$(`#${field_id}`).val(selected_value).trigger('change');
+}
 
-					}
+}
 
-					function extract_country_cities (event_type = '') {
-
-
-						let country = $("#country").getSelectedItemData();
-
-						if (event_type == 'onSelectItemEvent') {
-							$('#country').val(country);
-						}
-						else {
-							$('#country').val(country).trigger('change');
-						}
+function extract_country_cities (event_type = '') {
 
 
-						let country_cities_list = org_cities_list.filter(function (value) {
+let country = $("#country").getSelectedItemData();
 
-							return value['country'] == country;
+if (event_type == 'onSelectItemEvent') {
+$('#country').val(country);
+}
+else {
+$('#country').val(country).trigger('change');
+}
 
-						});
 
-						console.log('cities list');
-						console.log(country_cities_list);
+let country_cities_list = org_cities_list.filter(function (value) {
 
-						let city_options = {
-							data: country_cities_list.filter((value, index, self) => self.indexOf(value) === index),
-							getValue: "name",
-							adjustWidth: false,
-							list: {
-								maxNumberOfElements: org_cities_list.length,
-								hideOnEmptyPhrase: false,
-								match: {
-									enabled: true
-								},
-								onClickEvent: function () {
-									let city = $("#city").getSelectedItemData();
-									console.log('changed city onClickEvent ' + city)
-									$('#city').val(city.name).trigger('change');
+return value['country'] == country;
 
-								},
-								onSelectItemEvent: function () {
-									let city = $("#city").getSelectedItemData();
-									console.log('changed city onSelectItemEvent ' + city)
-									$('#city').val(city.name);
-								},
-								onChooseEvent: function () {
-									let city = $("#city").getSelectedItemData();
-									console.log('changed country onChooseEvent ' + city)
-									$('#city').val(city.name).trigger('change');
-								}
+});
 
-							}
-						};
+console.log('cities list');
+console.log(country_cities_list);
 
-						$("#city").easyAutocomplete(city_options);
+let city_options = {
+data: country_cities_list.filter((value, index, self) => self.indexOf(value) === index),
+getValue: "name",
+adjustWidth: false,
+list: {
+maxNumberOfElements: org_cities_list.length,
+hideOnEmptyPhrase: false,
+match: {
+enabled: true
+},
+onClickEvent: function () {
+let city = $("#city").getSelectedItemData();
+console.log('changed city onClickEvent ' + city)
+$('#city').val(city.name).trigger('change');
 
-					}
+},
+onSelectItemEvent: function () {
+let city = $("#city").getSelectedItemData();
+console.log('changed city onSelectItemEvent ' + city)
+$('#city').val(city.name);
+},
+onChooseEvent: function () {
+let city = $("#city").getSelectedItemData();
+console.log('changed country onChooseEvent ' + city)
+$('#city').val(city.name).trigger('change');
+}
+
+}
+};
+
+$("#city").easyAutocomplete(city_options);
+
+}
 
                     let country_options = {
                         data: org_countries_list.filter((value, index, self) => self.indexOf(value) === index),
@@ -653,19 +654,19 @@ function viewSaveSearch(data) {
                         adjustWidth: false,
                         list: {
                             maxNumberOfElements: org_countries_list.length,
-							hideOnEmptyPhrase: false,
+hideOnEmptyPhrase: false,
                             match: {
                                 enabled: true
                             },
-							onClickEvent: function () {
-								extract_country_cities();
-							},
-							onSelectItemEvent: function () {
-								extract_country_cities('onSelectItemEvent');
-							},
-							onChooseEvent: function () {
-								extract_country_cities();
-							}
+onClickEvent: function () {
+extract_country_cities();
+},
+onSelectItemEvent: function () {
+extract_country_cities('onSelectItemEvent');
+},
+onChooseEvent: function () {
+extract_country_cities();
+}
                         }
 
                     };
@@ -673,53 +674,53 @@ function viewSaveSearch(data) {
                     $("#country").easyAutocomplete(country_options);
 
 
-					// Previous city block start
+// Previous city block start
 
-					let city_options = {
-						data: org_cities_list.filter((value, index, self) => self.indexOf(value) === index),
-						getValue: "name",
-						adjustWidth: false,
-						list: {
-							maxNumberOfElements: org_cities_list.length,
-							hideOnEmptyPhrase: false,
-							match: {
-								enabled: true
-							},
-							onClickEvent: function () {
-								let city = $("#city").getSelectedItemData();
-								console.log('changed city onClickEvent ' + city);
-								$('#city').val(city.name).trigger('change');
-							},
-							onSelectItemEvent: function () {
-								let city = $("#city").getSelectedItemData();
-								console.log('changed city onSelectItemEvent ' + city);
-								$('#city').val(city.name);
-							},
-							onChooseEvent: function () {
-								let city = $("#city").getSelectedItemData();
-								console.log('changed country onChooseEvent ' + city);
-								$('#city').val(city.name).trigger('change');
-							}
-						}
-					};
+let city_options = {
+data: org_cities_list.filter((value, index, self) => self.indexOf(value) === index),
+getValue: "name",
+adjustWidth: false,
+list: {
+maxNumberOfElements: org_cities_list.length,
+hideOnEmptyPhrase: false,
+match: {
+enabled: true
+},
+onClickEvent: function () {
+let city = $("#city").getSelectedItemData();
+console.log('changed city onClickEvent ' + city);
+$('#city').val(city.name).trigger('change');
+},
+onSelectItemEvent: function () {
+let city = $("#city").getSelectedItemData();
+console.log('changed city onSelectItemEvent ' + city);
+$('#city').val(city.name);
+},
+onChooseEvent: function () {
+let city = $("#city").getSelectedItemData();
+console.log('changed country onChooseEvent ' + city);
+$('#city').val(city.name).trigger('change');
+}
+}
+};
 
-					$("#city").easyAutocomplete(city_options);
+$("#city").easyAutocomplete(city_options);
 
-					// Previous city block end
+// Previous city block end
 
                     swiper_instance = swiper_profiles_img(); // get swiper instance for later on use
                     $('.aw_section_results').show();
                     $('.aw_wrapper').preloader('remove');
                     $('#search_resut_count').text(total_results + ' results found for ' + '"' + search_obj['search_str'] + '"');
 
-					if ('view_saved_search' in data && data['view_saved_search'] == true) {
-						$.each(data.filter_weights, function (filter_field, filter_weight) {
-							$(`#${filter_field}`).bootstrapSlider('enable').bootstrapSlider('setValue', filter_weight);
-						});
-					}
-					
-					highlight_selected(common_elements_among_search_results);
-					
+if ('view_saved_search' in data && data['view_saved_search'] == true) {
+$.each(data.filter_weights, function (filter_field, filter_weight) {
+$(`#${filter_field}`).bootstrapSlider('enable').bootstrapSlider('setValue', filter_weight);
+});
+}
+
+highlight_selected(common_elements_among_search_results);
+
                 }
                 else {
                     $('.aw_section_results').hide();
@@ -738,18 +739,18 @@ function viewSaveSearch(data) {
     }
     window.execute_search = execute_search;
     $(document).on('click', '.search-submit', function (e) {
-		if (e.type == 'click' || e.which == 13) {
+if (e.type == 'click' || e.which == 13) {
 
             e.preventDefault();
-		 	perform_new_search();
-					
-		}
+perform_new_search();
+
+}
     });
     $(document).on('keypress', '#search-text', function (e) {
-		if (e.which == 13) {
+if (e.which == 13) {
             e.preventDefault();
-			perform_new_search();
-		}		
+perform_new_search();
+}
     });
 
 
@@ -918,7 +919,7 @@ function viewSaveSearch(data) {
 
             if (name && val.trim()) {
 
-				// file tag exception
+// file tag exception
 
                 search_obj['filters'][name] = val;
 
@@ -943,15 +944,15 @@ function viewSaveSearch(data) {
 
             let placeholder = field_placeholders[filter_key];
 
-			let selected_filter_display_value = search_obj['filters'][filter_key];
+let selected_filter_display_value = search_obj['filters'][filter_key];
 
-			/* 			
-			if (filter_key == 'file_tag' && selected_filter_display_value == 'no__csv__tags__') {
+/*
+if (filter_key == 'file_tag' && selected_filter_display_value == 'no__csv__tags__') {
 
-				selected_filter_display_value = 'No File Tags Selected';
+selected_filter_display_value = 'No File Tags Selected';
 
-			} 
-			*/
+}
+*/
 
             filters_li += `<li filter-name="${filter_key}"><span>${placeholder} <b>${selected_filter_display_value}</b> <i class="fas fa-times"></i></span></li>`;
 
@@ -1013,57 +1014,58 @@ function viewSaveSearch(data) {
         let result_job_location = concat_loc(result_obj.organization_city_1, result_obj.organization_country_1);
         let result_organization_title = empty_if_invalid_val(result_obj.organization_title_1);
         let current_organization = empty_if_invalid_val(result_obj.organization_1);
-		let result_school  = empty_if_invalid_val(result_obj.school_1);
+let result_school  = empty_if_invalid_val(result_obj.school_1);
         let sec_source_link = empty_if_invalid_val(result_obj.sec_source_link);
         let sec_link_html = '';
-		let result_degree_of_connection = '';
-        console.log(result_photo , result_full_name , result_location , result_job_location ,result_organization_title , result_school )
-		
-		if (firsDegreeContacts.indexOf(result_obj.contact_id) > -1) {
-		
-			result_degree_of_connection = '1st';
-			
-		}
-		else if (secondDegreeContacts.indexOf(result_obj.contact_id) > -1) {
-			
-			result_degree_of_connection = '2nd';
-			
-		}
-		else if (thirdDegreeContacts.indexOf(result_obj.contact_id) > -1) {
-			
-			result_degree_of_connection = '3rd';
-					
-		}
-		else {
-			
-			result_degree_of_connection = 'Out of Network';
-			
-		}
-		
+let result_degree_of_connection = '';
+
+if (firsDegreeContacts.indexOf(result_obj.contact_id) > -1) {
+
+result_degree_of_connection = '1st';
+
+}
+else if (secondDegreeContacts.indexOf(result_obj.contact_id) > -1) {
+
+result_degree_of_connection = '2nd';
+
+}
+else if (thirdDegreeContacts.indexOf(result_obj.contact_id) > -1) {
+
+result_degree_of_connection = '3rd';
+
+}
+else {
+
+result_degree_of_connection = 'Out of Network';
+
+}
+
         //'<li class="sec"><a href="#"></a></li>'+
         let source_icons = '';
+if (wiki_source_link != '') {
+    source_icons = `<span class="aw_card_source_icon" id = "wikipedia-work"><a href="${wiki_source_link}" target="_blank"><img src="/static/img/logos/wikipedia.png" alt="Wikipedia" /></a></span>`;
+}
+            //    if (sec_source_link != '') {
+                //    source_icons += `<span class="aw_card_source_icon"><a href="${sec_source_link}" target="_blank"><img src="/static/img/logos/sec.png" alt="U.S. Securities and Exchange Commission" /></a></span>`;
+            //    }
 
-        //        if (sec_source_link != '') {
-        //            source_icons += `<span class="aw_card_source_icon"><a href="${sec_source_link}" target="_blank"><img src="/static/img/logos/sec.png" alt="U.S. Securities and Exchange Commission" /></a></span>`;
-        //        }
-
-//        let ico_count = 1;
-//        while (result_obj['social_profile_link_' + ico_count]) {
-//            let platform_source_link = result_obj['social_profile_link_' + ico_count];
-//            let platform_icon = result_obj['platform_' + ico_count];
-////            console.log(result_obj['social_profile_link_' + ico_count]);
-//            source_icons += `<span class="aw_card_source_icon">
-//                             <a href="${platform_source_link}" target="_blank">
-//                             <img src="/static/img/logos/${platform_icon}.png" alt="U.S. Securities and Exchange Commission" />
-//                             </a>
-//                             </span>`;
-//            ico_count++;
-//        }
+    //    let ico_count = 1;
+    //    while (result_obj['social_profile_link_' + ico_count]) {
+        //    let platform_source_link = result_obj['social_profile_link_' + ico_count];
+        //    let platform_icon = result_obj['platform_' + ico_count];
+           console.log(result_obj['social_profile_link_' + ico_count]);
+        //    source_icons += `<span class="aw_card_source_icon">
+                            // <a href="${platform_source_link}" target="_blank">
+                            // <img src="/static/img/logos/${platform_icon}.png" alt="U.S. Securities and Exchange Commission" />
+                            // </a>
+                            // </span>`;
+        //    ico_count++;
+    //    }
 
         let listed_platforms = [];
         let ico_count = 1;
         //while (result_obj['job_profile_link_' + ico_count]) {
-		while (ico_count <= result_obj['org_job_to_from_count']) {
+while (ico_count <= result_obj['org_job_to_from_count']) {
 
             if (listed_platforms.indexOf(result_obj['job_platform_' + ico_count]) == -1) {
 //                console.log(result_obj['full_name']);
@@ -1072,23 +1074,23 @@ function viewSaveSearch(data) {
                 let platform_source_link = result_obj['job_profile_link_' + ico_count];
                 let platform_icon = result_obj['job_platform_' + ico_count];
 
-				if (result_obj['job_platform_' + ico_count]) {
+if (result_obj['job_platform_' + ico_count]) {
 
-					//if (['sec', 'yahoo', 'bloomberg'].indexOf(result_obj['job_platform_' + ico_count].toLowerCase()) < 0)
-					if (result_obj['job_platform_' + ico_count].toLowerCase() == 'csv' || result_obj['job_platform_' + ico_count].toLowerCase() == 'null') {
-						ico_count++;
-						continue;
-					}
+//if (['sec', 'yahoo', 'bloomberg'].indexOf(result_obj['job_platform_' + ico_count].toLowerCase()) < 0)
+if (result_obj['job_platform_' + ico_count].toLowerCase() == 'csv' || result_obj['job_platform_' + ico_count].toLowerCase() == 'null') {
+ico_count++;
+continue;
+}
 
-				}
+}
 
-				if (platform_source_link) {
-				    source_icons += `<span class="aw_card_source_icon"><a href="${platform_source_link}" target="_blank"><img src="/static/img/logos/${platform_icon}.png" alt="Social Icon" /></a></span>`;
-				}
-//				else{
-//				    console.log(platform_source_link);
-//				    source_icons += `<span class="aw_card_source_icon"><a href="${platform_source_link}" target="_blank"><img src="/static/img/logos/${platform_icon}.png" alt="Social Icon" /></a></span>`;
-//				}
+if (platform_source_link) {
+   source_icons += `<span class="aw_card_source_icon"><a href="${platform_source_link}" target="_blank"><img src="/static/img/logos/${platform_icon}.png" alt="Social Icon" /></a></span>`;
+}
+// else{
+//    console.log(platform_source_link);
+//    source_icons += `<span class="aw_card_source_icon"><a href="${platform_source_link}" target="_blank"><img src="/static/img/logos/${platform_icon}.png" alt="Social Icon" /></a></span>`;
+// }
 
 //                source_icons += `<span class="aw_card_source_icon"><a href="${platform_source_link}" target="_blank"><img src="/static/img/logos/${platform_icon}.png" alt="Social Icon" /></a></span>`;
             }
@@ -1111,53 +1113,52 @@ function viewSaveSearch(data) {
                 feedback_value[search_feedback[contact_index]['feedback']] = 'selected';
             }
         }
-		
-		let contact_type_head = '';
-		let contact_type_head_class = '';
 
-		if (source_icons == '') {
-			
-			contact_type_head = 'User Imported Contact';
-			contact_type_head_class = 'imported_contact_card_head';
-			
-		}
-		else {
-			
-			contact_type_head = 'Auto Scrapped Contact';
-			contact_type_head_class = 'scrapped_contact_card_head';
-		
-		}
-		
-		let contact_type_html = '';
+let contact_type_head = '';
+let contact_type_head_class = '';
 
-		if (user_isa) {
-		    contact_type_html = `<div class="${contact_type_head_class}">${contact_type_head}</div>`;
-		}
+if (source_icons == '') {
 
-		let confidence_score = result_obj['confidence_score']['calculated_score'];
-		console.log('confidence score ');
-		console.log(confidence_score);
-					
-        
+contact_type_head = 'User Imported Contact';
+contact_type_head_class = 'imported_contact_card_head';
+
+}
+else {
+
+contact_type_head = 'Auto Scrapped Contact';
+contact_type_head_class = 'scrapped_contact_card_head';
+
+}
+
+let contact_type_html = '';
+
+if (user_isa) {
+   contact_type_html = `<div class="${contact_type_head_class}">${contact_type_head}</div>`;
+}
+
+let confidence_score = result_obj['confidence_score']['calculated_score'];
+console.log('confidence score ');
+console.log(confidence_score);
+
         var html = `<div class="col-md-6">
             <article class="aw_card">
-				${contact_type_html}
+${contact_type_html}
                 <div class="aw_card_body aw_slide_to_click">
                     <div class="aw_card_thumb">
                         <figure><div><img src="${result_photo}" alt=""></div></figure>
                     </div>
                     <div class="aw_card_header">
                         <h3 class="aw_card_title">${result_full_name}</h3>
-						<div class="aw_card_degree_of_connection">${result_degree_of_connection}</div>
+<div class="aw_card_degree_of_connection">${result_degree_of_connection}</div>
                         <div class="aw_card_location">${result_job_location}</div>
                         <div class="aw_card_subtitle">${result_organization_title}</div>
                         <div class="aw_card_meta aw_card_org">${current_organization}</div>
-						<div class="aw_card_meta aw_card_edu">${result_school}</div>	
-						<div class="aw_card_meta aw_card_edu">${confidence_score}% confidence score</div>	
+<div class="aw_card_meta aw_card_edu">${result_school}</div>
+<div class="aw_card_meta aw_card_edu">${confidence_score}% confidence score</div>
                     </div>
                 </div>
-				<div class="aw_card_footer">
-					<div class="aw_card_likes">
+<div class="aw_card_footer">
+<div class="aw_card_likes">
                     <a class="aw_thumbs_up ${feedback_value['1']}" href="javascript:void(0)" data-contact_id="${result_obj.contact_id}">
                         <i class="far fa-thumbs-up"></i>
                     </a>
@@ -1167,13 +1168,13 @@ function viewSaveSearch(data) {
                     <a class="aw_thumbs_maybe ${feedback_value['3']}" href="javascript:void(0)" data-contact_id="${result_obj.contact_id}">
                         <i class="far fa-thumbs-up"></i>
                     </a>
-					</div>
+</div>
                     <div class="aw_card_socials">
                         ${source_icons}
-					</div>
-				</div>
-			</article>
-		</div>`;
+</div>
+</div>
+</article>
+</div>`;
 
         return html;
     }
@@ -1189,26 +1190,26 @@ function viewSaveSearch(data) {
         }
 
         let reasons_content = get_search_reason(data);
-		//let warmth_of_relationship = '';
+//let warmth_of_relationship = '';
         let warmth_of_relationship = get_warmth_of_relationship(data);
         var first_degree_relation = {};
         var second_degree_relation = {};
         var third_degree_relation = {};
         var degree_relation = '';
         var degree_contact_id = data['contact_id'];
-		var mutual_connections_list = [];
-		var mutual_connections_html_string = '';
-		var mutual_connections_img_list = '';
-		var common_elements_html_string = '';
-		var mutual_connections_names_html_string = '';
-		var third_and_third_plus_connections = '';
+var mutual_connections_list = [];
+var mutual_connections_html_string = '';
+var mutual_connections_img_list = '';
+var common_elements_html_string = '';
+var mutual_connections_names_html_string = '';
+var third_and_third_plus_connections = '';
 
-		first_degree_relation = firsDegreeContacts;
+first_degree_relation = firsDegreeContacts;
         second_degree_relation = secondDegreeContacts;
         third_degree_relation = thirdDegreeContacts;
-		
-		let is_scrapped_content = true;
-		
+
+let is_scrapped_content = true;
+
 
         if (first_degree_relation) {
             var containsFirstDegree = (first_degree_relation.indexOf(degree_contact_id) > -1);
@@ -1217,81 +1218,81 @@ function viewSaveSearch(data) {
         if (second_degree_relation) {
             var containsSecondDegree = (second_degree_relation.indexOf(degree_contact_id) > -1);
 
-			let common_features_org_count = data['common_features']['organization'].length;
-			let common_features_edu_count = data['common_features']['education'].length;
-			let common_features_names = '';
+let common_features_org_count = data['common_features']['organization'].length;
+let common_features_edu_count = data['common_features']['education'].length;
+let common_features_names = '';
 
-			if ((common_features_org_count > 0) || (common_features_edu_count > 0)) {
-				
-				for (let cfio = 0; cfio < common_features_org_count; cfio++) {
-					common_features_names +=  `<div>${data['common_features']['organization'][cfio]}</div>`;
-				}
+if ((common_features_org_count > 0) || (common_features_edu_count > 0)) {
 
-				for (let cfie = 0; cfie < common_features_org_count; cfie++) {
-					common_features_names +=  `<div>${data['common_features']['education'][cfie]}</div>`;
-				}
+for (let cfio = 0; cfio < common_features_org_count; cfio++) {
+common_features_names +=  `<div>${data['common_features']['organization'][cfio]}</div>`;
+}
 
-				if (common_features_names.trim() != '') {
-					common_elements_html_string = `<div class="common_features"><h6>Both you and ${data['full_name']} have following in common</h6>${common_features_names}</div>`;			
-				}
-				
-			}
+for (let cfie = 0; cfie < common_features_org_count; cfie++) {
+common_features_names +=  `<div>${data['common_features']['education'][cfie]}</div>`;
+}
 
-			if (!containsFirstDegree && containsSecondDegree && degree_contact_id in response.mutual_connections) {
+if (common_features_names.trim() != '') {
+common_elements_html_string = `<div class="common_features"><h6>Both you and ${data['full_name']} have following in common</h6>${common_features_names}</div>`;
+}
 
-				for (let fdci = 0; fdci < response.mutual_connections[degree_contact_id].length; fdci++) {
+}
 
-					mutual_connections_list.push({'name': response.first_degree_connections_details[response.mutual_connections[degree_contact_id][fdci]]['full_name'], 'photo': data['photo']});
+if (!containsFirstDegree && containsSecondDegree && degree_contact_id in response.mutual_connections) {
 
-				}
+for (let fdci = 0; fdci < response.mutual_connections[degree_contact_id].length; fdci++) {
 
-				let number_of_mutual_connections = mutual_connections_list.length;
+mutual_connections_list.push({'name': response.first_degree_connections_details[response.mutual_connections[degree_contact_id][fdci]]['full_name'], 'photo': data['photo']});
 
-				if (number_of_mutual_connections > 0) {					
-					
-					let mutual_connections_names = '';
-					let mutual_connections_images = '';
-					
-					for (let mii = 0; mii < number_of_mutual_connections; mii++) {
+}
 
-						let img_src = '/static/img/avatar.png';
+let number_of_mutual_connections = mutual_connections_list.length;
 
-						if (mutual_connections_list[mii]['photo'] != '' && mutual_connections_list[mii]['photo'] != 'null' && mutual_connections_list[mii]['photo'] != null && mutual_connections_list[mii]['photo'] !== undefined  && mutual_connections_list[mii]['photo'] !== 'undefined') {
-							img_src = mutual_connections_list[mii]['photo'];
-						}
+if (number_of_mutual_connections > 0) {
 
-						let name_separator = ',';
+let mutual_connections_names = '';
+let mutual_connections_images = '';
 
-						if (mii == number_of_mutual_connections - 1) {
-							name_separator = ' and';
-						}
+for (let mii = 0; mii < number_of_mutual_connections; mii++) {
 
-						mutual_connections_names += `${name_separator} ${mutual_connections_list[mii]['name']}`;
-						mutual_connections_images += '<img src="'+img_src+'" />';
-					}
+let img_src = '/static/img/avatar.png';
 
-					mutual_connections_names_html_string = `<div class="mutual_connection_detail"><h6>${mutual_connections_list.length} mutual connection(s)</h6><div>You ${mutual_connections_names} know ${data['full_name']}</div></div>`;
+if (mutual_connections_list[mii]['photo'] != '' && mutual_connections_list[mii]['photo'] != 'null' && mutual_connections_list[mii]['photo'] != null && mutual_connections_list[mii]['photo'] !== undefined  && mutual_connections_list[mii]['photo'] !== 'undefined') {
+img_src = mutual_connections_list[mii]['photo'];
+}
+
+let name_separator = ',';
+
+if (mii == number_of_mutual_connections - 1) {
+name_separator = ' and';
+}
+
+mutual_connections_names += `${name_separator} ${mutual_connections_list[mii]['name']}`;
+mutual_connections_images += '<img src="'+img_src+'" />';
+}
+
+mutual_connections_names_html_string = `<div class="mutual_connection_detail"><h6>${mutual_connections_list.length} mutual connection(s)</h6><div>You ${mutual_connections_names} know ${data['full_name']}</div></div>`;
 
 
-					mutual_connections_img_list = `<figure class="mutual_connections_thumb">${mutual_connections_images}</figure>`;				
+mutual_connections_img_list = `<figure class="mutual_connections_thumb">${mutual_connections_images}</figure>`;
 
-					mutual_connections_html_string = `<div class="aw_mutual_connections">
-														${mutual_connections_img_list}
-														<div class="mutual_connections">
-															${mutual_connections_names_html_string}
-														</div>
-													  </div>`;
+mutual_connections_html_string = `<div class="aw_mutual_connections">
+${mutual_connections_img_list}
+<div class="mutual_connections">
+${mutual_connections_names_html_string}
+</div>
+ </div>`;
 
-					
-				}
 
-			}
+}
+
+}
 
         }
-        
-		if (third_degree_relation) {
-            
-			var containsThirdDegree = (third_degree_relation.indexOf(degree_contact_id) > -1);
+       
+if (third_degree_relation) {
+           
+var containsThirdDegree = (third_degree_relation.indexOf(degree_contact_id) > -1);
 
         }
 
@@ -1303,48 +1304,48 @@ function viewSaveSearch(data) {
         }
         else if (containsThirdDegree == true ) {
             degree_relation = `<span class="contact-degree-relation">3rd</span>`;
-			
-			if (data['contact_id'] in response.connection_graph) {
 
-				remote_response_graph = response.connection_graph;
+if (data['contact_id'] in response.connection_graph) {
 
-				console.log('sec_degree_connection_details');
+remote_response_graph = response.connection_graph;
 
-				if ('sec_degree_connection_details' in response) {
+console.log('sec_degree_connection_details');
 
-					console.log(response.sec_degree_connection_details);
+if ('sec_degree_connection_details' in response) {
 
-					remote_sec_deg_connection_details = response.sec_degree_connection_details;
+console.log(response.sec_degree_connection_details);
 
-				}
+remote_sec_deg_connection_details = response.sec_degree_connection_details;
 
-				let first_deg_connections = [];			
-				let sec_deg_connections = [];
-				
-				let cgraph =  response.connection_graph[data['contact_id']];
+}
 
-				for (let degc = 0; degc < cgraph.length; degc++) {
-									
-					if (first_deg_connections.indexOf(cgraph[degc][1]) === -1) {
-						first_deg_connections.push(cgraph[degc][1]);
-					}
-					
-					if (sec_deg_connections.indexOf(cgraph[degc][2]) === -1) {
-						sec_deg_connections.push(cgraph[degc][2]);												
-					}
-					
-					third_and_third_plus_connections = `<div class="mutual_connection_detail sec_degree_connection_head"><h6>2nd degree Mutual Connection(s)</h6><a class="third-degree-mut" href="javascript:void(0)" contact-id="${data['contact_id']}"><em>See Connections</em></a>`;
-					
-				}
-				
-				console.log(data['contact_id'] + ' in graph found ');
-				console.log('Response Graph ' , response.connection_graph[data['contact_id']]);
-							
-			}			
-			
+let first_deg_connections = [];
+let sec_deg_connections = [];
+
+let cgraph =  response.connection_graph[data['contact_id']];
+
+for (let degc = 0; degc < cgraph.length; degc++) {
+
+if (first_deg_connections.indexOf(cgraph[degc][1]) === -1) {
+first_deg_connections.push(cgraph[degc][1]);
+}
+
+if (sec_deg_connections.indexOf(cgraph[degc][2]) === -1) {
+sec_deg_connections.push(cgraph[degc][2]);
+}
+
+third_and_third_plus_connections = `<div class="mutual_connection_detail sec_degree_connection_head"><h6>2nd degree Mutual Connection(s)</h6><a class="third-degree-mut" href="javascript:void(0)" contact-id="${data['contact_id']}"><em>See Connections</em></a>`;
+
+}
+
+console.log(data['contact_id'] + ' in graph found ');
+console.log('Response Graph ' , response.connection_graph[data['contact_id']]);
+
+}
+
         }
         else {
-            degree_relation = `<span class="contact-degree-relation">Out of Network</span>`;	
+            degree_relation = `<span class="contact-degree-relation">Out of Network</span>`;
         }
 
 
@@ -1392,13 +1393,13 @@ function viewSaveSearch(data) {
                     var shortDescription = jQuery.trim(des).substring(0, 200)
                     .split(" ").slice(0, -1).join(" ") + ".....";
 
-					let img_src;
-					if (link != '' && platform.toLowerCase() != 'csv') {
-					    img_src = '<img src="/static/img/logos/'+platform+'.png" />';
-					}
-					else {
-					    img_src = '';
-					}
+let img_src;
+if (link != '' && platform.toLowerCase() != 'csv') {
+   img_src = '<img src="/static/img/logos/'+platform+'.png" />';
+}
+else {
+   img_src = '';
+}
 
 
                     if (des != '' && link != '' ){
@@ -1459,47 +1460,47 @@ function viewSaveSearch(data) {
                 let link = empty_if_invalid_val(data['job_profile_link_' + counter]);
                 let platform = empty_if_invalid_val(data['job_platform_' + counter]);
                 let org_counter = empty_if_invalid_val(data['organization_' + counter]); // name of organization
-                
-				let job_info = {'org': org_counter, 'org_title': org_title, 'org_start': org_start, 'org_end': org_end, 'link': link, 'platform': platform };
+               
+let job_info = {'org': org_counter, 'org_title': org_title, 'org_start': org_start, 'org_end': org_end, 'link': link, 'platform': platform };
 
-				if (org_counter != '') {
-					
-					if (org_counter in common_elements_among_search_results['job']) {
-						common_elements_among_search_results['job'][org_counter] += 1;
-																								
-						if (common_elements_among_search_results['job'][org_counter] > common_elements_among_search_results['job']['__max__']['count']) {
-							common_elements_among_search_results['job']['__max__'] = {'org': org_counter, 'count': common_elements_among_search_results['job'][org_counter]};																
-						}
-					}
-					else {
-						common_elements_among_search_results['job'][org_counter] = 1;
-					}
-					
-					console.log('common_elements_among_search_results ', common_elements_among_search_results);
-							
-				}
+if (org_counter != '') {
 
-			                				
-				if (experience_not_shown(job_info)) {
+if (org_counter in common_elements_among_search_results['job']) {
+common_elements_among_search_results['job'][org_counter] += 1;
+
+if (common_elements_among_search_results['job'][org_counter] > common_elements_among_search_results['job']['__max__']['count']) {
+common_elements_among_search_results['job']['__max__'] = {'org': org_counter, 'count': common_elements_among_search_results['job'][org_counter]};
+}
+}
+else {
+common_elements_among_search_results['job'][org_counter] = 1;
+}
+
+console.log('common_elements_among_search_results ', common_elements_among_search_results);
+
+}
+
+               
+if (experience_not_shown(job_info)) {
 
                     listed_experience.push(job_info);
                     var job_date = '';
                     if (org_start != '' || org_end != '') {
                         var job_date= `<div class='aw_card_meta'>(${org_start} - ${org_end})</div>`;
                     }
-					// const capitalizeFirstLetter = ([ first, ...rest ], locale = navigator.language) =>
-					// 	first.toLocaleUpperCase(locale) + rest.join('')
+// const capitalizeFirstLetter = ([ first, ...rest ], locale = navigator.language) =>
+// first.toLocaleUpperCase(locale) + rest.join('')
 
-					let img_src;
-					if (link != '' && platform.toLowerCase() != 'csv') {
-					    img_src = '<img src="/static/img/logos/'+platform+'.png" />';
-					}
-					else if (platform.toLowerCase() == 'csv') {
-					    img_src = '<img src="/static/img/logos/'+platform.toLowerCase()+'.png" />';
-					}
-					else {
-					    img_src = '';
-					}
+let img_src;
+if (link != '' && platform.toLowerCase() != 'csv') {
+   img_src = '<img src="/static/img/logos/'+platform+'.png" />';
+}
+else if (platform.toLowerCase() == 'csv') {
+   img_src = '<img src="/static/img/logos/'+platform.toLowerCase()+'.png" />';
+}
+else {
+   img_src = '';
+}
 
                     if (org_title != ''){
 
@@ -1549,28 +1550,28 @@ function viewSaveSearch(data) {
 
                 let edu_info = {'edu_degree': edu_degree, 'edu_school': edu_school, 'edu_start': edu_start, 'edu_end': edu_end, 'link': link, 'platform': platform };
 
-				if (edu_school != '') {
-					
-					if (edu_school in common_elements_among_search_results['edu']) {
-						common_elements_among_search_results['edu'][edu_school] += 1;
+if (edu_school != '') {
 
-						if (common_elements_among_search_results['edu'][edu_school] > common_elements_among_search_results['edu']['__max__']['count']) {
-							common_elements_among_search_results['edu']['__max__'] = {'edu': edu_school, 'count': common_elements_among_search_results['edu'][edu_school]};																
-						}					
-						
-					}
-					else {
-						common_elements_among_search_results['edu'][edu_school] = 1;
-					}
-										
-					console.log('common_elements_among_search_results ... ', common_elements_among_search_results);
-												
-				}
+if (edu_school in common_elements_among_search_results['edu']) {
+common_elements_among_search_results['edu'][edu_school] += 1;
 
-		
+if (common_elements_among_search_results['edu'][edu_school] > common_elements_among_search_results['edu']['__max__']['count']) {
+common_elements_among_search_results['edu']['__max__'] = {'edu': edu_school, 'count': common_elements_among_search_results['edu'][edu_school]};
+}
+
+}
+else {
+common_elements_among_search_results['edu'][edu_school] = 1;
+}
+
+console.log('common_elements_among_search_results ... ', common_elements_among_search_results);
+
+}
+
+
                 if (education_not_shown(edu_info)) {
                     listed_education.push(edu_info);
-					
+
                     var edu_date = '';
                     if (edu_start != '' || edu_end != '') {
                         var edu_date= `<div class='aw_card_meta'>(${edu_start} - ${edu_end})</div>`;
@@ -1578,16 +1579,16 @@ function viewSaveSearch(data) {
                     // const capitalizeFirstLetter = ([ first, ...rest ], locale = navigator.language) =>
                     //         first.toLocaleUpperCase(locale) + rest.join('')
 
-					let img_src;
-					if (link != '' && platform.toLowerCase() != 'csv') {
-					    img_src = '<img src="/static/img/logos/'+platform+'.png" />';
-					}
-					else if (platform.toLowerCase() == 'csv') {
-					    img_src = '<img src="/static/img/logos/'+platform.toLowerCase()+'.png" />';
-					}
-					else {
-					    img_src = '';
-					}
+let img_src;
+if (link != '' && platform.toLowerCase() != 'csv') {
+   img_src = '<img src="/static/img/logos/'+platform+'.png" />';
+}
+else if (platform.toLowerCase() == 'csv') {
+   img_src = '<img src="/static/img/logos/'+platform.toLowerCase()+'.png" />';
+}
+else {
+   img_src = '';
+}
 
 
                     if (edu_school != '') {
@@ -1662,55 +1663,55 @@ function viewSaveSearch(data) {
         }
 
         var article_counter = 0;
-		
-		let twitter_tweets = '';
-		let twitter_notification = '';
-		
-		function gen_twitter_notification (data) {
 
-			let tweet_notification = '';
-			
-			if ('twitter_tweets' in data && data['twitter_tweets'].length > 0) {
-				
-				tweet_notification += `<div class="aw_card_body">`;
-				tweet_notification += `<div class="tweet_notification_container"><a href="javascript:void(0)" contact-id="${data['contact_id']}" class="tweet_notification_link">${data['twitter_tweets'].length} matching tweets</a></div>`;									
-				tweet_notification += `</div>`;
-														
-			}
-			
-			return tweet_notification;
-			
-		}
-		
-		function gen_tweet_content (data) {
-			
-			let tweet_content = ''
-			
-			if ('twitter_tweets' in data && data['twitter_tweets'].length > 0) {
-				
-				tweet_content += `<div id="tp-tweets-${data['contact_id']}" class="aw_card_body tp_detail_tweets">`;
-				//tweet_content += `<h6>Contact Tweets</h6>`;	
-				
-				for (let tci = 0; tci < data['twitter_tweets'].length; tci++) {
-				
-					//tweet_content += `<div class="tweet_content tweet_content_container"><a href="https://twitter.com/${data['twitter_profile']}/status/${data['twitter_tweets'][tci]['id']}" target="_blank">${data['twitter_tweets'][tci]['text']}</a></div>`;					
-					tweet_content += `<div class="tweet_content tweet_content_container"><a href="https://twitter.com/${data['twitter_profile']}/status/${data['twitter_tweets'][tci]['id']}" target="_blank">${data['twitter_tweets'][tci]['text']}</a></div>`;
-					
-				}
-				
-				tweet_content += `</div>`;
-														
-			}
-			
-			return tweet_content
-			
-		}
-		
-		
-		twitter_tweets = gen_tweet_content(data);
-		twitter_notification = gen_twitter_notification(data);
-        
-		var html = '<div class="swiper-slide">' +
+let twitter_tweets = '';
+let twitter_notification = '';
+
+function gen_twitter_notification (data) {
+
+let tweet_notification = '';
+
+if ('twitter_tweets' in data && data['twitter_tweets'].length > 0) {
+
+tweet_notification += `<div class="aw_card_body">`;
+tweet_notification += `<div class="tweet_notification_container"><a href="javascript:void(0)" contact-id="${data['contact_id']}" class="tweet_notification_link">${data['twitter_tweets'].length} matching tweets</a></div>`;
+tweet_notification += `</div>`;
+
+}
+
+return tweet_notification;
+
+}
+
+function gen_tweet_content (data) {
+
+let tweet_content = ''
+
+if ('twitter_tweets' in data && data['twitter_tweets'].length > 0) {
+
+tweet_content += `<div id="tp-tweets-${data['contact_id']}" class="aw_card_body tp_detail_tweets">`;
+//tweet_content += `<h6>Contact Tweets</h6>`;
+
+for (let tci = 0; tci < data['twitter_tweets'].length; tci++) {
+
+//tweet_content += `<div class="tweet_content tweet_content_container"><a href="https://twitter.com/${data['twitter_profile']}/status/${data['twitter_tweets'][tci]['id']}" target="_blank">${data['twitter_tweets'][tci]['text']}</a></div>`;
+tweet_content += `<div class="tweet_content tweet_content_container"><a href="https://twitter.com/${data['twitter_profile']}/status/${data['twitter_tweets'][tci]['id']}" target="_blank">${data['twitter_tweets'][tci]['text']}</a></div>`;
+
+}
+
+tweet_content += `</div>`;
+
+}
+
+return tweet_content
+
+}
+
+
+twitter_tweets = gen_tweet_content(data);
+twitter_notification = gen_twitter_notification(data);
+       
+var html = '<div class="swiper-slide">' +
             '<article class="aw_card">' +
             '<div class="aw_card_header">' +
             '<div class="aw_card_thumb">' +
@@ -1729,24 +1730,24 @@ function viewSaveSearch(data) {
             '</div>' +
             '</div>' +
             //'<div class="aw_card_reason"><p>' + reasons_content + '</p></div>' +
-			'<div class="aw_card_reason"><p>' + third_and_third_plus_connections + '</p></div>' +
+'<div class="aw_card_reason"><p>' + third_and_third_plus_connections + '</p></div>' +
             '<div class="connnections_wrapper">' +
                 '<div class="connnections_container">' +
-					mutual_connections_html_string +
+mutual_connections_html_string +
                 '</div>' +
-				'<div>' + 
-					warmth_of_relationship +
-				'</div>' + 
+'<div>' +
+warmth_of_relationship +
+'</div>' +
             '</div>' +
-			'<div class="aw_card_reason">' + reasons_content + '</div>' +
+'<div class="aw_card_reason">' + reasons_content + '</div>' +
             '<div class="aw_card_body">' +
                 profile_content +
                 job_title_content +
                 education_content +
             '</div>' +
-			twitter_notification + 
-			twitter_tweets + 
-			'</article>' +
+twitter_notification +
+twitter_tweets +
+'</article>' +
             '</div>';
         $('.swiper-wrapper').append(html);
     }
@@ -1795,19 +1796,19 @@ function viewSaveSearch(data) {
     $(document).on('click', '.aw_slide_to_click', function () {
 
         if (swiper_instance !== null) {
-            
-			var index = $(this).closest('.col-md-6').index();
+           
+var index = $(this).closest('.col-md-6').index();
             swiper_instance.slideTo(index);
-			//$("html, body").animate({ scrollTop: 0 }, 'slow'); // bring on top
-        
-		}
+//$("html, body").animate({ scrollTop: 0 }, 'slow'); // bring on top
+       
+}
 
     });
 
     function get_search_reason (data) {
 
         let occr_fields_list = data['occurance_fields'];
-		let highlights = data['highlights'];
+let highlights = data['highlights'];
         let common_institutions = data['common_institutions'];
         let reasons_html = '';
         let reason_field_or_value = '';
@@ -1816,12 +1817,12 @@ function viewSaveSearch(data) {
         // let fields_lists = ['first_name', 'last_name', 'industry', 'organization', 'organization_title_', 'description'];
 
         //let occr_field_name = Object.keys(occr_fields_list[ofi])[0];
-		console.log('Occr field ' , occr_fields_list);
-		
+console.log('Occr field ' , occr_fields_list);
+
         for (let ofi = 0; ofi < occr_fields_list.length; ofi++) {
 
             let occr_field_name = Object.keys(occr_fields_list[ofi])[0];
-			console.log('Occr field name ', occr_field_name);
+console.log('Occr field name ', occr_field_name);
 
             if (occr_field_name == 'first_name' || occr_field_name == 'last_name') {
                 reason_field_or_value = 'Name';
@@ -1831,8 +1832,8 @@ function viewSaveSearch(data) {
                     name += data['highlights']['full_name'];
                 }
 
-				//reasons_html = `<b>Result Reason:</b> <u>${name}</u> in <span class="result_reason_field">Name</span> field`;
-				reasons_html = `<h6>Result Reason</h6> <u>${name}</u> in <span class="result_reason_field">Name</span> field`;
+//reasons_html = `<b>Result Reason:</b> <u>${name}</u> in <span class="result_reason_field">Name</span> field`;
+reasons_html = `<h6>Result Reason</h6> <u>${name}</u> in <span class="result_reason_field">Name</span> field`;
 
             }
             else if (occr_field_name == 'industry') {
@@ -1840,7 +1841,7 @@ function viewSaveSearch(data) {
                 text_found = data['highlights'][occr_field_name];
 
                 //reasons_html = `<b>Industry</b> ${data['highlights']['industry']}`;
-				reasons_html = `<b>Result Reason</b> <u>${data['highlights']['industry']}</u> in <span class="result_reason_field">Industry</span> field`;
+reasons_html = `<b>Result Reason</b> <u>${data['highlights']['industry']}</u> in <span class="result_reason_field">Industry</span> field`;
 
             }
             else if (occr_field_name.indexOf('organization_title_') > -1) {
@@ -1858,21 +1859,21 @@ function viewSaveSearch(data) {
 
                 //reasons_html = `<b>${curr_or_prev} ${reason_field_or_value}</b> ${job_title}`;
                 reasons_html = `<h6>Result Reason</h6>  <b>${curr_or_prev} ${reason_field_or_value}</b> ${job_title} in <span class="result_reason_field">Industry</span> field`;
-				
+
             }
-			else if (occr_field_name.indexOf('job_title') > -1) {
-				console.log(`Organization title ${occr_field_name}`); 
+else if (occr_field_name.indexOf('job_title') > -1) {
+console.log(`Organization title ${occr_field_name}`);
                 reason_field_or_value = 'job ';
                 let curr_or_prev = '';
                 let job_title = '';
-				
-				job_title = occr_fields_list[ofi][occr_field_name];
+
+job_title = occr_fields_list[ofi][occr_field_name];
 
 
                 //reasons_html = `<b>${curr_or_prev} ${reason_field_or_value}</b> ${job_title}`;
                 reasons_html = `<h6>Result Reason</h6> <u>${job_title}</u> in <span class="result_reason_field">Job Title</span> field`;
-				
-			}
+
+}
             else if (occr_field_name.indexOf('organization_') > -1) {
                 reason_field_or_value = data['highlights']['organization_name'];
                 let curr_or_prev = '';
@@ -1901,17 +1902,17 @@ function viewSaveSearch(data) {
 
                 reasons_html = `<h6>Result Reason</h6> <b>${curr_or_prev} ${reason_field_or_value}</b> ${degree_title}`;
             }
-			else if (occr_field_name.indexOf('degree') > -1) {
+else if (occr_field_name.indexOf('degree') > -1) {
                 reason_field_or_value = 'Degree ';
-				
+
                 let degree_title = occr_fields_list[ofi][occr_field_name];
 
-                reasons_html = `<h6>Result Reason</h6><span class="result_reason_field">${degree_title}</span> in <b>${reason_field_or_value}</b> `;				
-			}
+                reasons_html = `<h6>Result Reason</h6><span class="result_reason_field">${degree_title}</span> in <b>${reason_field_or_value}</b> `;
+}
             else if (occr_field_name.indexOf('school_') > -1) {
-				let school_occr_index = occr_field_name.match(/_(\d+$)/)[0].slice(1);
-				let reason_field_or_value = data['school_'+school_occr_index];
-				let curr_or_prev = '';
+let school_occr_index = occr_field_name.match(/_(\d+$)/)[0].slice(1);
+let reason_field_or_value = data['school_'+school_occr_index];
+let curr_or_prev = '';
                 if (school_occr_index == '1') {
                     curr_or_prev = 'Current';
                 }
@@ -1928,11 +1929,11 @@ function viewSaveSearch(data) {
         }
 
         if (occr_fields_list.length === 0) {
-			
-			if (typeof data['highlights']['full_name'] !== 'undefined') {
+
+if (typeof data['highlights']['full_name'] !== 'undefined') {
                 text_found = data['highlights']['full_name'];
-                reasons_html = `<h6>Result Reason</h6><div>${text_found} in <span class="result_reason_field">Name</span></div>`;										
-			}
+                reasons_html = `<h6>Result Reason</h6><div>${text_found} in <span class="result_reason_field">Name</span></div>`;
+}
             else if (typeof data['highlights']['job_title'] !== 'undefined') {
                 text_found = data['highlights']['job_title'];
                 reasons_html = `<h6>Result Reason</h6><div>${text_found} in <span class="result_reason_field">Job Title</span></div>`;
@@ -1941,13 +1942,13 @@ function viewSaveSearch(data) {
                 text_found = data['highlights']['description'][0];
                 reasons_html = `<h6>Result Reason</h6><div>Matching text found in <span class="result_reason_field">Profile</span> description (See <em>Emphasized</em> text in profile) </div><div class="mt-2"><b>Profile</b> ${text_found}</div>`;
             }
-			/*
-			else if (typeof data['highlights']['degree'] !== 'undefined') {
-				console.log('Matching degree found ');
-				text_found = data['highlights']['degree'][0];
+/*
+else if (typeof data['highlights']['degree'] !== 'undefined') {
+console.log('Matching degree found ');
+text_found = data['highlights']['degree'][0];
                 reasons_html = `<h6>Result Reason</h6><div>{text_found} Matching text found in <span class="result_reason_field">Degree</span></div>`;
-			}
-			*/
+}
+*/
 
         }
 
@@ -1958,50 +1959,50 @@ function viewSaveSearch(data) {
     function get_warmth_of_relationship (data) {
 
         let reasons_html = '';
-		
-		let num_of_common_institutions = 0;		
+
+let num_of_common_institutions = 0;
 
         let common_institutions = data['common_institutions'];
 
         let commonly_attended_institutions_types = Object.keys(common_institutions);
-		
-		let commonly_attended_institutions_types_len = commonly_attended_institutions_types.length;
+
+let commonly_attended_institutions_types_len = commonly_attended_institutions_types.length;
 
         if (commonly_attended_institutions_types_len > 0) {
 
-			num_of_common_institutions += data['common_institutions']['education'].length
-			num_of_common_institutions += data['common_institutions']['organization'].length
+num_of_common_institutions += data['common_institutions']['education'].length
+num_of_common_institutions += data['common_institutions']['organization'].length
 
             reasons_html += `<div class="aw_warmth_relations"><h6>Warmth of Relations</h6>`
 
-			let already_listed_common_institution = [];
-			
-			if (num_of_common_institutions > 0) {
-				
-				for (let cai_index = 0; cai_index < commonly_attended_institutions_types_len; cai_index++) {
+let already_listed_common_institution = [];
 
-					if (common_institutions[commonly_attended_institutions_types[cai_index]].length > 0) {
+if (num_of_common_institutions > 0) {
 
-						for (let ci = 0; ci < common_institutions[commonly_attended_institutions_types[cai_index]].length; ci++) {
+for (let cai_index = 0; cai_index < commonly_attended_institutions_types_len; cai_index++) {
 
-							if (already_listed_common_institution.indexOf(common_institutions[commonly_attended_institutions_types[cai_index]][ci]) === -1) {
+if (common_institutions[commonly_attended_institutions_types[cai_index]].length > 0) {
 
-								already_listed_common_institution.push(common_institutions[commonly_attended_institutions_types[cai_index]][ci]);
-								reasons_html += `<div>${common_institutions[commonly_attended_institutions_types[cai_index]][ci]}</div>`;
-							}
+for (let ci = 0; ci < common_institutions[commonly_attended_institutions_types[cai_index]].length; ci++) {
 
-						}
+if (already_listed_common_institution.indexOf(common_institutions[commonly_attended_institutions_types[cai_index]][ci]) === -1) {
 
-					}
+already_listed_common_institution.push(common_institutions[commonly_attended_institutions_types[cai_index]][ci]);
+reasons_html += `<div>${common_institutions[commonly_attended_institutions_types[cai_index]][ci]}</div>`;
+}
 
-				}				
-					
-			}
-			else {
-				
-				reasons_html += `<div>None</div>`;
-						
-			}
+}
+
+}
+
+}
+
+}
+else {
+
+reasons_html += `<div>None</div>`;
+
+}
 
             reasons_html += '</div>';
 
@@ -2207,7 +2208,7 @@ function viewSaveSearch(data) {
         if (file_tags_checkbox_list === '') {
             //file_tags_checkbox_list = file_tags_suggestions_list.slice();
             file_tags_checkbox_list = file_tags_suggestions_list.slice();
-			console.log('updated list ');
+console.log('updated list ');
         }
 
         console.log('file tag list ');
@@ -2293,150 +2294,150 @@ function viewSaveSearch(data) {
             $('#file_tag').trigger('change');
 
     });
-	
-	$('body').on("click", ".third-degree-mut", function () {
-		
-		let contact_id = $(this).attr('contact-id');
 
-		console.log('rrg', remote_response_graph);
-		console.log('sdcd', remote_sec_deg_connection_details);
+$('body').on("click", ".third-degree-mut", function () {
 
-		let paths_list = remote_response_graph[contact_id];
+let contact_id = $(this).attr('contact-id');
 
-		let ul_html = '';	
+console.log('rrg', remote_response_graph);
+console.log('sdcd', remote_sec_deg_connection_details);
 
-		$('#modalMutualConnections ul.mdl_mutual_connection_list').html('');
+let paths_list = remote_response_graph[contact_id];
 
-		for (let pl = 0; pl < paths_list.length; pl++) {
+let ul_html = '';
 
-			let fdc = paths_list[pl][1];
-			let sdc = paths_list[pl][2];
+$('#modalMutualConnections ul.mdl_mutual_connection_list').html('');
 
-			let fdc_photo = '/static/img/avatar.png';
+for (let pl = 0; pl < paths_list.length; pl++) {
 
-			if (remote_sec_deg_connection_details[sdc]['photo']) {
-				fdc_photo = remote_sec_deg_connection_details[sdc]['photo'];
-			}
+let fdc = paths_list[pl][1];
+let sdc = paths_list[pl][2];
 
-			let first_degree_connection_names = '';
+let fdc_photo = '/static/img/avatar.png';
+
+if (remote_sec_deg_connection_details[sdc]['photo']) {
+fdc_photo = remote_sec_deg_connection_details[sdc]['photo'];
+}
+
+let first_degree_connection_names = '';
 
 
-			let second_degree_paths_list = remote_response_graph[sdc];
-			let first_degree_name_separator = '';
+let second_degree_paths_list = remote_response_graph[sdc];
+let first_degree_name_separator = '';
 
-			for (let sdpl = 0; sdpl < second_degree_paths_list.length; sdpl++) {
+for (let sdpl = 0; sdpl < second_degree_paths_list.length; sdpl++) {
 
-				if (sdpl > 0) {
-					if (sdpl == second_degree_paths_list.length - 1) {
-						first_degree_name_separator = ` and `;
-					}
-					else {
-						first_degree_name_separator = `, `;
-					}
-				}	
+if (sdpl > 0) {
+if (sdpl == second_degree_paths_list.length - 1) {
+first_degree_name_separator = ` and `;
+}
+else {
+first_degree_name_separator = `, `;
+}
+}
 
-				let fdcd = second_degree_paths_list[sdpl][1];					
-				first_degree_connection_names += `${remote_sec_deg_connection_details[fdcd]['full_name']} `;
-				
-			}
+let fdcd = second_degree_paths_list[sdpl][1];
+first_degree_connection_names += `${remote_sec_deg_connection_details[fdcd]['full_name']} `;
 
-			let org_job_title = '';
+}
 
-			if (remote_sec_deg_connection_details[sdc]['job_title'] && remote_sec_deg_connection_details[sdc]['organization_name']) {
-				org_job_title = `${remote_sec_deg_connection_details[sdc]['job_title']}, ${remote_sec_deg_connection_details[sdc]['organization_name']}`; 
-			}
-			else if (remote_sec_deg_connection_details[sdc]['organization_name']) {
-				org_job_title = `${remote_sec_deg_connection_details[sdc]['organization_name']}`; 
-			}
-			else if (remote_sec_deg_connection_details[sdc]['job_title']) {
-				org_job_title = `${remote_sec_deg_connection_details[sdc]['job_title']}`; 
-			}
+let org_job_title = '';
 
-			ul_html += `<li>
-							<figure>
-								<img src="${fdc_photo}" />
-							</figure>
-							<div class="mdl_mutual_conn_item">
-								<div class="mdl_conn_title">${remote_sec_deg_connection_details[sdc]['full_name']} (2nd)</div>
-								<div class="mdl_conn_detail">${org_job_title}</div>
-								<div class="mdl_conn_detail"><span class="sec_fst_deg_con_names">${first_degree_connection_names}${first_degree_name_separator}</div>
-							</div>
-					    </li>`; 
-							
-		}
+if (remote_sec_deg_connection_details[sdc]['job_title'] && remote_sec_deg_connection_details[sdc]['organization_name']) {
+org_job_title = `${remote_sec_deg_connection_details[sdc]['job_title']}, ${remote_sec_deg_connection_details[sdc]['organization_name']}`;
+}
+else if (remote_sec_deg_connection_details[sdc]['organization_name']) {
+org_job_title = `${remote_sec_deg_connection_details[sdc]['organization_name']}`;
+}
+else if (remote_sec_deg_connection_details[sdc]['job_title']) {
+org_job_title = `${remote_sec_deg_connection_details[sdc]['job_title']}`;
+}
 
-		$('#modalMutualConnections ul.mdl_mutual_connection_list').html(ul_html);
+ul_html += `<li>
+<figure>
+<img src="${fdc_photo}" />
+</figure>
+<div class="mdl_mutual_conn_item">
+<div class="mdl_conn_title">${remote_sec_deg_connection_details[sdc]['full_name']} (2nd)</div>
+<div class="mdl_conn_detail">${org_job_title}</div>
+<div class="mdl_conn_detail"><span class="sec_fst_deg_con_names">${first_degree_connection_names}${first_degree_name_separator}</div>
+</div>
+   </li>`;
 
-		$('#modalMutualConnections').modal('show');
-		
-	});
-		
-	$('body').on("click", ".tweet_notification_link", function () {
+}
 
-		let contact_id = $(this).attr('contact-id');
+$('#modalMutualConnections ul.mdl_mutual_connection_list').html(ul_html);
 
-		//let tp_tweets_html = $(`#tp-tweets-${contact_id}`).html();
-		let $tp_tweets_html = $(`#tp-tweets-${contact_id}`).clone().attr('id', `tp-tweets-modal-${contact_id}`).removeClass('tp_detail_tweets');
-		
-		console.log($tp_tweets_html);
-		//console.log(tp_tweets_html);
-		
-		
-		$('#modalPosts .modal-body').html($tp_tweets_html);
+$('#modalMutualConnections').modal('show');
 
-		$('#modalPosts').modal('show');
+});
 
-						
-	});
-	
-	function highlight_selected (common_elements_among_search_results) {
-		
-		let edu_max = common_elements_among_search_results['edu']['__max__']['edu'];
-		let job_max = common_elements_among_search_results['job']['__max__']['org'];
-		
-		$('article div.aw_card_org').each(function () {
-						
-			if ($(this)[0].outerText == job_max) {
-				
-				$(this)[0].style.color = '#f95252';
-				
-			}
-						
-		});
-		
-		$('article div.aw_card_edu').each(function () {
-			
-			if ($(this)[0].outerText == edu_max) {
-				
-				$(this)[0].style.color = '#f95252';
-				
-			}
-						
-		});		
-		
-	}
-	
-	
-	/* var stickyTop = $('#resultsCarousel').offset().top;
-	
- 	$(window).scroll(function() {
-		
-		var windowTop = $(window).scrollTop();
-		
-		//if (stickyTop < windowTop && $(".seerch-result-holder").height() + $(".seerch-result-holder").offset().top - $("#resultsCarousel").height() > windowTop) {
-		
-		if (stickyTop < windowTop && windowTop > $('#resultsCarousel').height()) {
-		
-			$('#resultsCarousel').css('position', 'fixed');
-    
-		} else {
-			
-			$('#resultsCarousel').css('position', 'relative');
-		
-		}
-		
-	});	 */ 
-			
+$('body').on("click", ".tweet_notification_link", function () {
+
+let contact_id = $(this).attr('contact-id');
+
+//let tp_tweets_html = $(`#tp-tweets-${contact_id}`).html();
+let $tp_tweets_html = $(`#tp-tweets-${contact_id}`).clone().attr('id', `tp-tweets-modal-${contact_id}`).removeClass('tp_detail_tweets');
+
+console.log($tp_tweets_html);
+//console.log(tp_tweets_html);
+
+
+$('#modalPosts .modal-body').html($tp_tweets_html);
+
+$('#modalPosts').modal('show');
+
+
+});
+
+function highlight_selected (common_elements_among_search_results) {
+
+let edu_max = common_elements_among_search_results['edu']['__max__']['edu'];
+let job_max = common_elements_among_search_results['job']['__max__']['org'];
+
+$('article div.aw_card_org').each(function () {
+
+if ($(this)[0].outerText == job_max) {
+
+$(this)[0].style.color = '#f95252';
+
+}
+
+});
+
+$('article div.aw_card_edu').each(function () {
+
+if ($(this)[0].outerText == edu_max) {
+
+$(this)[0].style.color = '#f95252';
+
+}
+
+});
+
+}
+
+
+/* var stickyTop = $('#resultsCarousel').offset().top;
+
+  $(window).scroll(function() {
+
+var windowTop = $(window).scrollTop();
+
+//if (stickyTop < windowTop && $(".seerch-result-holder").height() + $(".seerch-result-holder").offset().top - $("#resultsCarousel").height() > windowTop) {
+
+if (stickyTop < windowTop && windowTop > $('#resultsCarousel').height()) {
+
+$('#resultsCarousel').css('position', 'fixed');
+   
+} else {
+
+$('#resultsCarousel').css('position', 'relative');
+
+}
+
+}); */
+
 })(jQuery);
 
 function is_str_valid_json (json_str) {

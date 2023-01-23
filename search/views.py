@@ -9,17 +9,24 @@ from django import template
 from django.template.defaultfilters import register
 
 from altworkz.settings import ES_INDEX_URL
-
+# from wikipedia_scrape.views import Wiki_Search
 from .websearch import WebSearch
 from .elasticsearch import ElasticSearch
 from .graph import *
 from .utilities import *
+import nltk
+from nltk.corpus import wordnet
 
 import edgar
 from edgar import Company, TXTML
 from bs4 import BeautifulSoup
 from altworkz.settings import BASE_DIR
 from querystring_parser import parser
+
+import spacy
+from spacy import displacy
+nlp = spacy.load('en_core_web_sm')
+
 
 import os
 import json
@@ -35,19 +42,19 @@ from search_history.models import SearchHistory
 
 
 @login_required
-def index(request):
-
+def index(request):    
     user = User.objects.get(id=request.user.id)
     page_obj = user.search_terms.all().order_by('-id')
-    
+    check = Profile.objects.filter(user_id = request.user.id).values("is_first_login")
+    print("check----------------->" , check)
     context = {}
     
-    if user.profile.is_first_login == 1:
+    # if user.profile.is_first_login == 1:
 
-        Profile.objects.filter(user_id=request.user.id).update(is_first_login=0)         
-        request.session['first_time_login'] = True
-        contact_id = Profile.objects.get(user_id=request.user.id).contact_id
-        return redirect('userboard/update_profile/'+str(contact_id))
+    #     Profile.objects.filter(user_id=request.user.id).update(is_first_login=0)         
+    #     request.session['first_time_login'] = True
+    #     contact_id = Profile.objects.get(user_id=request.user.id).contact_id
+    #     return redirect('userboard/update_profile/'+str(contact_id))
   
     user_contacts = []
     user_organization = []
@@ -122,6 +129,34 @@ def index(request):
 
     return render(request, "search/search_results.html", {'page_obj':page_obj, 'context':context, 'browsed_history': browsed_history, 'search_history': search_history})
 
+def Wikisearch(request):
+    params_dict = parser.parse(request.GET.urlencode())
+    print("--------HERE WIKI ", params_dict)
+    resultList = []
+    result = {}
+    for i , j in params_dict.items():
+        if i == 'CEO':
+            print("--------",i)
+            val = 'List_of_chief_executive_officers'
+            # Wiki_Search(request ,val)
+            res = requests.get(url=f"https://en.wikipedia.org/wiki/{val}")
+            res.encoding = "utf-8"
+            soup = BeautifulSoup(res.text  , 'html.parser')
+            found_Val = {}
+            found_Val['Value'] = soup.select('.vector-body > table ,  tr , td , a')
+        
+        
+            td_valueFound = False
+            for i in found_Val['Value']:
+                if i.name == 'tr':
+                        print('----FROM HERE---->')
+                        td_valueFound = True
+                if i.name == 'td':
+                        print("***********************************",i.text)
+                        resultList.append(i.get_text())
+                        # if td_valueFound:
+                            # break
+    print(resultList)
 def es_search(request):
 
     # os.system('cls')  # clear screen to refresh console messages
@@ -130,6 +165,7 @@ def es_search(request):
 
     # search_type = 'web'
     search_type = 'elastic'
+    # search_type = 'wikipedia'
 
     search = {}
     params_dict = parser.parse(request.GET.urlencode())
@@ -164,7 +200,6 @@ def es_search(request):
         print('----------Here---------')
 
     if request.method == "GET" and request.GET.get('search_str', False):
-
         if search_type == 'web':
 
             search = WebSearch()
@@ -201,22 +236,92 @@ def es_search(request):
                         # request.session['search_history_id'] = save_search.id
 
                     else:
-
                         save_search.save()
                         request.session['search_history_id'] = save_search.id
 
-        #     print('first_search_after_page_load')
-        #     print(request.GET.get('first_search_after_pageload'))
-        #     print("------------------------- SEARCH HISTORY ID -------------------------\n " + str(save_search.id))
-        #     print(request.GET.get(''))
-        # ws = WebSearch()
         page_num = request.GET.get('page_num', 1)
         print("page num in view ", page_num)
         additional_values_to_be_forwarded = {}
         print('here the values to be forwarded' ,additional_values_to_be_forwarded)
         context['results'] = search.query(request.GET.get('search_str', False), function_type, filters, filter_weights, page_num, additional_values_to_be_forwarded) # {'location': 'Manchester', 'industry': 'Engineering'} with filters
+        Wiki_Url = {}
+        search_type_wiki = {}
+        get_title = {}
+        title_lis = []
+        title_val = []
+        checkvalid = {}
+        many_res = {}
+        invalid_results ={}   
+        synonyms_search = []                                                                     
+        for url_check in context['results'].copy():
+            for key2 , valu in list(url_check.items()):
+                if key2 == "full_name":
+                    word_token = nlp(valu)
+                    for e in word_token.ents:
+                        print("e.label , e.texte.label , e.text" ,  e.label_ , e.text)
+                        if e.label_=="PERSON":
+                            name = e.text.replace(" " , "_")
+                            var = f"https://en.wikipedia.org/wiki/{name}"
+                            r = requests.get(var)
+
+
+# '''Checking the status of URL for Scraping'''
+
+                            if r.status_code == 200:
+                                print(var)
+                                soup = BeautifulSoup(r.text  , 'html.parser')
+                                r.encoding = "utf-8"
+                                checkvalid['Check'] = soup.select(".infobox")
+                                for k ,  v in checkvalid.items():
+                                    if v != [ ]:
+                                        
+                                        search_type_wiki['label']= soup.select(".infobox-label")
+                                        for label in search_type_wiki['label']:
+                                            title_lis.append(label.get_text())
+                                        search_type_wiki['Data'] = soup.select(".infobox-data")
+                                        for i in search_type_wiki['Data']:
+                                            title_val.append(i.get_text())
+                                        count = 0  
+                                        for i in title_lis:
+                                            get_title[i] = title_val[count]
+                                            count += 1
+                                        for key , val in get_title.items():
+                                            if key == "Title":
+                                                check2= val.split(" ")
+                                                for url_check in context['results'].copy():
+                                                        for key2 , valu in list(url_check.items()):
+                                                            if key2 == "job_title":
+                                                                print(key2 == "job_title" ,valu ,  "----------")
+                                                                for syn in wordnet.synsets(valu):
+                                                                    for l in syn.lemmas():
+                                                                        print(l.name() , "JOB TITLE-----------")
+                                                                        for i in synonyms_search:
+                                                                            if i in check2:
+                                                                                print(i)
+                                                                                Wiki_Url["wikipedia_url"]= var
+                                                                                url_check['Wikipedia_Url'] = var    
+                                                            else:
+                                                                print("-----------here not ----------") 
+                                    else:
+                                        print("INVALID HERE")
+                                        many_res['check'] = soup.select(".mw-parser-output > ul > li")
+                                        for res in many_res['check']:
+                                            key = res.get_text()
+                                            # invalid_results[key] = key.split(' ')
+                                        # for i , j in invalid_results.items():
+                                            # for k in check_list:
+                                                # if k in j:
+                                                    # print("ok Here it works" , k)
+                                                # else:
+                                            print("No it's not there" , k)
+                            elif 400 <= r.status_code < 50:
+                                print(r.status_code , "NOT WORKING", var )
+                            else:
+                                print(r.status_code,  "NOT FOUND", var)
+
         context['total_results'] = additional_values_to_be_forwarded['total_results']
         print('yes:' , context['total_results'])
+
         if request.GET.get('view_saved_search', False):
             context['view_saved_search'] = True
             
@@ -395,6 +500,22 @@ def es_search(request):
     # return render(request, 'search/search_results.html', context)
     # return render(request, 'search/web_results.html', context)
     context['staff'] = User.objects.get(id=request.user.id).is_staff    
+    # for key , value in context.items():
+        # if key  == "results":
+            # for result_item in value:
+                # for Name , Name_value in result_item.items():
+                    # if Name == 'full_name':
+                        # print(Name_value)
+                        # Actual_Name = Name_value.replace(' ','_')
+                        # print(Actual_Name)
+                        # var = f"https://en.wikipedia.org/wiki/{Actual_Name}"
+                        # r = requests.get(var)
+                        # if r.status_code == 200:
+                            # print(r.ok , "Working" , var)
+                        # elif 400 <= r.status_code < 50:
+                            # print(r.status_code , "NOT WORKING", var )
+                        # else:
+                            # print(r.status_code,  "NOT FOUND", var)
     return HttpResponse(json.dumps(context, sort_keys=False, indent=4))
 
 @csrf_exempt

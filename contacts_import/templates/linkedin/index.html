@@ -40,7 +40,7 @@
 		<div class="aw_section_body">
 			<div class="aw_import_nav">
 				<ul class="aw_import_list">
-					<li><a href="/contacts">CSV</a></li>
+					<li><a href="/contacts/update">CSV</a></li>
 					<li><a href="/contacts/people-api">Google</a></li>
 					<li><a href="/contacts/facebook-contacts-import" class="work-in-progress">Facebook</a></li>
 					<li><a href="/contacts/twitter-contacts-import">Twitter</a></li>
@@ -72,7 +72,7 @@
 						<li>Click <b>Get a copy of your data</b>.</li>
 						<li>Select <b>Connections</b> checkbox only and then click <b>Request archive</b>. You will be asked to provide your LinkedIn password. Enter password in prompt and click <b>Done</b> button.</li>
 						<li>You will be sent email when your data is ready.</li>
-						<li>Download the generated CSV file and import the file into <a href="https://www.altworkz.com/contacts/">CSV</a> section of Altworkz while selecting <i><u>LinkedIn connections CSV</u></i> for <b>Select CSV type</b> option.</li>
+						<li>Download the generated CSV file and import the file into <a href="https://www.altworkz.com/contacts/update">CSV</a> section of Altworkz while selecting <i><u>LinkedIn connections CSV</u></i> for <b>Select CSV type</b> option.</li>
 					</ol>
 				</div>
 			</div>
@@ -161,7 +161,7 @@
 		//window.location.href="https://www.linkedin.com/oauth/v2/authorization?client_id=77awx9dduw0nez&redirect_uri=https://ps19testserver.com/contacts/linkedin-callback&state="+csrf+"&response_type=code&scope=r_liteprofile%20r_emailaddress";
 		//window.location.href="https://www.linkedin.com/oauth/v2/authorization?client_id=77awx9dduw0nez&redirect_uri=https://ps19testserver.com/contacts/linkedin-callback&state="+csrf+"&response_type=code&scope=r_liteprofile%20r_emailaddress%20w_member_social";
 		
-		window.location.href="https://www.linkedin.com/oauth/v2/authorization?client_id=774mkvff40jh88&redirect_uri=http://127.0.0.1:8002/contacts/linkedin-callback&state="+csrf+"&response_type=code&scope=r_liteprofile%20r_emailaddress%20r_1st_connections";
+		window.location.href="https://www.linkedin.com/oauth/v2/authorization?client_id=774mkvff40jh88&redirect_uri=http://127.0.0.1:8000/contacts/linkedin-callback&state="+csrf+"&response_type=code&scope=r_liteprofile%20r_emailaddress%20r_1st_connections";
 		
 		//window.location.href="https://www.linkedin.com/oauth/v2/authorization?client_id=77awx9dduw0nez&redirect_uri=https://ps19testserver.com/contacts/linkedin-callback&state="+csrf+"&response_type=code&scope=r_compliance%20r_emailaddress";
 		 			

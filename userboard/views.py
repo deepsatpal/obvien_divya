@@ -469,8 +469,8 @@ def update_profile (request, id):
         
         if request.session.get('first_time_login', None) and request.session['first_time_login'] == True:
             context["first_time_login"] = True
-            messages.success(request , "Either you are providing invalid username or password OR your access to this system is approved by admin. In case you belive that you are supplying correct credentials, please contact rak@bridges.com for activation of your account.")
-            context['success_redirect_url'] = 'http://127.0.0.1:8001/contacts/'
+            #messages.success(request , "Either you are providing invalid username or password OR your access to this system is approved by admin. In case you belive that you are supplying correct credentials, please contact rak@bridges.com for activation of your account.")
+            context['success_redirect_url'] = 'http://127.0.0.1:8000/contacts/update'
             print(context)
 
     except:

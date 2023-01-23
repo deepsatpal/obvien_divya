@@ -12,6 +12,7 @@ from django.http import HttpResponse, JsonResponse, FileResponse
 from django.shortcuts import render, redirect
 import csv
 import io
+from django.contrib.auth.decorators import login_required
 import re
 from csv import DictReader
 from django.contrib import messages
@@ -28,6 +29,7 @@ from querystring_parser import parser
 from scrape_web.views import scrape_csv_contacts
 import threading
 from django.core.mail import send_mail
+from django.contrib.auth.models import User
 from django.conf import settings
 
 # def beta_login(request):
@@ -45,30 +47,43 @@ from django.conf import settings
 #         return render(request, 'csv/csv_form.html')
 #     except Exception as e:
 #         print(request.session.get)
-
+@login_required
 def index(request):
-    try:
-    # return HttpResponse("here",request)
-        context = {}
+    user = User.objects.get(id=request.user.id)
+    page_obj = user.search_terms.all().order_by('-id')
+    check = Profile.objects.filter(user_id = request.user.id).values("is_first_login")
+    print("check----------------->" , check)
+    context = {}
+    
+    if user.profile.is_first_login == 1:
 
-        context['csv_headers'] = get_csv_headers()
-        context['csv_initial_headers'] = context['csv_headers'][:7]
-        context['csv_additional_headers'] = context['csv_headers'][7:]
-        context['csv_headers_description'] = get_csv_headers_description()
+        Profile.objects.filter(user_id=request.user.id).update(is_first_login=0)         
+        request.session['first_time_login'] = True
+        contact_id = Profile.objects.get(user_id=request.user.id).contact_id
+        return redirect('/userboard/update_profile/'+str(contact_id))
+  
 
-        if request.session.get('csv_stats', None):
-            context['csv_stats'] = request.session['csv_stats']
-            del request.session['csv_stats']
+# return HttpResponse("here",request)
+    context = {}
 
-        if request.session.get('first_time_login', None) and request.session['first_time_login'] == True:
-            context['first_time_login'] = True 
-            # messages.info(request , "Welcome to Obvien! Let’s get you started shows walk-through <a href='#'>Ok</a>")
-            request.session['first_time_login'] = False
-        print(request.session.get)
-        # return HttpResponse(request , '<h1>Hello</h1>')
-        return render(request, "csv/csv_form.html", context)
-    except Exception as e:
-        print('error: %s' % e)
+    context['csv_headers'] = get_csv_headers()
+    context['csv_initial_headers'] = context['csv_headers'][:7]
+    context['csv_additional_headers'] = context['csv_headers'][7:]
+    context['csv_headers_description'] = get_csv_headers_description()
+
+    if request.session.get('csv_stats', None):
+        context['csv_stats'] = request.session['csv_stats']
+        del request.session['csv_stats']
+
+    if request.session.get('first_time_login', None) and request.session['first_time_login'] == True:
+        context['first_time_login'] = True 
+        # messages.info(request , "Welcome to Obvien! Let’s get you started shows walk-through <a href='#'>Ok</a>")
+        request.session['first_time_login'] = False
+   
+    print(request.session.get)
+    # return HttpResponse(request , '<h1>Hello</h1>')
+    return render(request, "csv/csv_form.html", context)
+
 
 
 def import_csv(request):
@@ -89,7 +104,7 @@ def import_csv(request):
             try:
                 if 'csv' in errors:
                     messages.add_message(request, messages.ERROR, errors['csv'][0]['message'])
-                return redirect('indexeE')
+                return redirect('/contacts/update')
             except Exception as e:
                 return HttpResponse("Here" , e)
         data_set = csv_file.read().decode('ISO-8859-1')
@@ -104,8 +119,9 @@ def import_csv(request):
             headers = [i for i in header if i]
             io_string = io.StringIO(data_set)
             if not validate_csv_headers(headers):
+                print("HEADERS____+_+_===>", headers)
                 messages.add_message(request, messages.ERROR, 'Headers in CSV are not Identical!')
-                return redirect('indexeE')
+                return redirect('/contacts/update')
                 # Social_CSV 
         elif csv_type == "social_csv":     
             header_uplod_csv = io_string.readline().strip()
@@ -133,7 +149,7 @@ def import_csv(request):
             io_string = io.StringIO(data_set)
             if not validate_social_csv_header(headers):
                 messages.add_message(request, messages.ERROR, 'Headers in CSV are not Identical!')
-                return redirect('indexeE')
+                return redirect('/contacts/update')
         else:
             header_uplod_csv = io_string.readlines()[0]
             header_uplods_csv = header_uplod_csv.split(",")
@@ -142,7 +158,7 @@ def import_csv(request):
             io_string = io.StringIO(data_set)
             if not validate_csv_headers(headers):
                 messages.add_message(request, messages.ERROR, 'Headers in CSV are not Identical!')
-                return redirect('indexeE')
+                return redirect('/contacts/update')
                 # return HttpResponse("here")
 
         # start: validation insert
@@ -168,14 +184,14 @@ def import_csv(request):
             total_rows += 1
             rejection_reasons = []
                         
-            if heaedr_index > 0:
+            if header_index > 0:
                 
                 header_index -= 1
                 continue 
 
-            # if index < 5:
+            if index < 5:
             
-                # print("CSV Row ", csv_row)
+                print("CSV Row ", csv_row)
                 
             if csv_type == "custom_csv":
                 print('===============DONE++++++++++++++++++1')
@@ -377,7 +393,7 @@ def import_csv(request):
                                 platform_link=csv_row['bloomberg_profile_url'],
                                 is_scraped=0
                             )
-
+                            print('--------here')
                         if contact_tags != '' and contact_tags is not None:
                             tag_method(contact_tags, contact.id)
 
@@ -570,7 +586,7 @@ def import_csv(request):
         # download_thread.start()
         print('===============DONE++++++++++++++++++3')
 
-        return redirect('indexeE')
+        return redirect('/contacts/update')
         # messages.add_message(request, messages.INFO, rejected_rows)
 
         #
@@ -734,7 +750,7 @@ def people_api_post(request):
 
             social_profiles, created = SocialProfile.objects.update_or_create(
                 platform_link='',
-                platform='Google Contact',
+                platform='  ',
                 is_scraped='1',
                 contact_id=contact.id,
             )
@@ -1479,7 +1495,7 @@ def linkedin_callback (request):
             #'client_secret': 'V0jax7jybmW1K9ni',
             'client_id': '774mkvff40jh88',
             'client_secret': 'nktafZ4ILChLqcYA',            
-            'redirect_uri': 'http://127.0.0.1:8002/contacts/linkedin-callback',
+            'redirect_uri': 'http://127.0.0.1:8000/contacts/linkedin-callback',
         })
         
         response = access_token_request.text

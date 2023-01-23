@@ -72,7 +72,7 @@ class ElasticSearch(Search):
         es_response = requests.get(self.request_url,
                                    headers={'Content-Type': 'application/json'},
                                    data=json.dumps(elastic_query_data))
-
+        print(json.loads(es_response.text))
         return json.loads(es_response.text)
                 
     def build_filtered_elastic_query(self, elastic_result_from):

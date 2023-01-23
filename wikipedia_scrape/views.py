@@ -16,6 +16,7 @@ def function_Search(request):
     if request.method == 'POST':
         search_str =request.POST.get('search')
         print("search_str===================>" , search_str)
+        # Wikipedia_results(request , search_str)
         scrape_results_type(request , search_str)
         # return render(reverse('try_wiki_app:search-results', args=(search_str,)))
 
@@ -75,7 +76,7 @@ def scrape_results_type( request , search_str ):
 
             print("typeId===================",typeId)
             print("industryId===================",industryId)
-            return
+            return                                                                  
         
 
 
@@ -185,7 +186,7 @@ def scrape_results_Content_sub(request , soup , Information_Id):
     
     for keys , value in object.items():
         if len(keys)==1:
-            sve_Content = Content_type.objects.create(keyID = keys , keyValue = value ,Info_Key = Info_ID)
+            save_Content = Content_type.objects.create(keyID = keys , keyValue = value ,Info_Key = Info_ID)
             save_Content.save()
             save_content_ID = save_Content.id
             
@@ -199,4 +200,9 @@ def scrape_results_Content_sub(request , soup , Information_Id):
                         level_length = len(keys.split("_"))
                         SubContent_sa = SubContent_type.objects.create(Sub_keyID = keys , Sub_keyValue = keyss , SubKey_Description = values  , level_Info =level_length,Content_Key = content_type)
                         SubContent_sa.save()
-   
+
+
+
+
+
+

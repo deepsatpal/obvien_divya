@@ -24,12 +24,12 @@ function search() {
 
     var html;
     $.ajax({
-        // url: '/api/search',
-        url: '/search/elastic-search', 
-        // contentType: "application/json",
-        dataType : 'json',
-        data: search_obj,
-        // data: JSON.stringify(search_obj),
+        url: '/api/search',
+        // url: '/search/elastic-search', 
+        contentType: "application/json",
+        // dataType : 'json',
+        // data: search_obj,
+        data: JSON.stringify(search_obj),
         success: function(data){
 
             $('.aw_section_recommendation').hide();

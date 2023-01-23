@@ -3,7 +3,7 @@ from django.urls import path, include
 from . import views 
 
 urlpatterns = [
-    path('', views.index, name='indexeE'),
+    path('update', views.index, name='index'),
     path('download-csv-template', views.download_csv_template, name='download-csv-template'),
     path('import_csv', views.import_csv, name='import_csv'),
     path('import_csv_sheet', views.import_csv_sheet, name='import_csv_sheet'),

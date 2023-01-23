@@ -306,7 +306,11 @@ def validate_social_csv_header(headers):
     upload_social_csv_headers = set(headers)
     print('upload_social_csv_headers:' , upload_social_csv_headers)
     print("Check:" ,impo_social_csv_herders.issubset(upload_social_csv_headers))
-
+    unfound = []
+    for i in impo_social_csv_herders:
+        for j in upload_social_csv_headers:
+            if i==j: print(i)
+            else : unfound.append(j) 
     if impo_social_csv_herders.issubset(upload_social_csv_headers):
         print('----------herejjjjjjj-----------')
         CSV_HEADERS_CONSTANTS = get_social_csv_headers()
@@ -314,8 +318,9 @@ def validate_social_csv_header(headers):
         csv_headers = set(headers)
         if len(csv_headers) > 0:
             if not csv_headers.issubset(csv_headers_cons):
-                return False
-        return True
+                return (False ,unfound)
+        print('here', i)
+        return True 
     else:
         return False
 
@@ -361,7 +366,7 @@ def import_csv_headers ():
     
 def import_social_csv_headers ():
 
-    return ['first_name' , 'middle_name' , 'organization_name' , 'organization_job_title']
+    return ['First Name', 'Last Name', 'Email Address', 'Company', 'Position', 'Connected On']
 
 def get_csv_headers_description ():
 
